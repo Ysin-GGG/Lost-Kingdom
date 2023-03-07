@@ -106,8 +106,7 @@ namespace LostKingdom
         public bool isFullScreen = false;
         /// <summary> 当前是否窗口最大化 </summary>
         public bool isScreenMaximized = false;
-
-
+        
         private static float screenOpacitySpeed;
         private long fps_curr = 0;
         private long fps_diff = 0;

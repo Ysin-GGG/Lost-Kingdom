@@ -13,7 +13,7 @@ namespace LostKingdom.Utils
         public string Path { get; private set; }
         public string Name { get; set; }
 
-        public Logger(string path = null, string name = "Logger.txt")
+        public Logger(string path = null, string name = "Logger.log")
         {
             this.Path = System.IO.Path.GetFullPath(path ?? Environment.CurrentDirectory);
             this.Name = name;
