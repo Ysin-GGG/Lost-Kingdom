@@ -1,0 +1,27 @@
+{
+  "Title": {
+    "Image": "图像文件",
+    "ImageOfUI": "UI{$Logger.Title.Image}",
+    "ImageOfCursor": "光标{$Logger.Title.Image}",
+    "ImageOfSplash": "界面{$Logger.Title.Image}",
+    "Sound": "音频文件",
+    "Font": "字体文件"
+  },
+  "Sender": {
+    "GameName": "{$Game.GameName}",
+    "Warning": "警告",
+    "Error": "错误"
+  },
+  "Message": {
+    "Loading": "正在加载游戏……",
+    "CheckLoadingAssets": "正在检测 [{0}] ：{1}",
+    "StartLoadingAssets": "发现 {0} 个文件，开始导入",
+    "StopLoadingAssets": "完成导入 [{0}]",
+    "LoadingAssetsSucceeded": "成功导入 {0} 个文件",
+    "LoadingAssetsFalied": "导入 [{0}] 失败：{1}",
+    "LoadingAssetSucceeded": "文件 [{0}] 导入成功（{1}/{2}）",
+    "LoadingAssetFalied": "文件 [{0}] 导入失败（{1}/{2}）",
+    "InvalidAssetPath": "该路径不存在或不存在可导入的文件",
+    "NullArg_UIElement": "传入的参数UIElement为空"
+  }
+}
