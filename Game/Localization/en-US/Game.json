@@ -1,0 +1,8 @@
+{
+  "GameName": "Lost Kingdom",
+  "Debug": {
+    "FPS": "FPS: {0}",
+    "Memory": "Memory Usage: {0}",
+    "ScreenSize": "Screen Size: {0}"
+  }
+}

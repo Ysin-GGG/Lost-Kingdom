@@ -1,8 +1,8 @@
 {
   "GameName": "Lost Kingdom",
   "Debug": {
-    "FPS": "帧率 = {0}",
-    "Memory": "内存占用 = {0}",
-    "ScreenSize": "窗口大小 = {0} "
+    "FPS": "帧率：{0}",
+    "Memory": "内存占用：{0}",
+    "ScreenSize": "窗口大小：{0} "
   }
 }

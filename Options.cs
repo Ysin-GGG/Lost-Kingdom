@@ -27,8 +27,10 @@ namespace LostKingdom
         public static float MusicVolume { get; set; } = 1f;
         /// <summary> 效果音量 </summary>
         public static float EffectVolume { get; set; } = 1f;
+        /// <summary> 当前使用的语言 </summary>
+        public static byte LanguageID { get; set; } = 2;
         /// <summary> 当前使用的分辨率 </summary>
-        public static int ScreenResolutionNum { get; set; } = 1;
+        public static byte ScreenResolutionNum { get; set; } = 1;
         /// <summary> 显示调试信息 </summary>
         public static bool ShowDebugMessage { get; set; } = true;
         /// <summary> 显示玩家设备输入 </summary>

@@ -131,7 +131,7 @@ namespace LostKingdom.GameContent.UI
                     string msg = string.Join("\n",
                         Localization.Localization.GetText("Game.Debug.FPS", Main.FPS),
                         Localization.Localization.GetText("Game.Debug.Memory", Utils.Utils.ConvertMemory(Main.Memory)),
-                        Localization.Localization.GetText("Game.Debug.ScreenSize", Main.ScreenSize)
+                        Localization.Localization.GetText("Game.Debug.ScreenSize", string.Format("{0}x{1}", Main.screenWidth, Main.screenHeight))
                         );
                     Vector2 pos = new Vector2();
                     Vector2[] bpos = new Vector2[4]

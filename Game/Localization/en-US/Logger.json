@@ -1,0 +1,27 @@
+{
+  "Title": {
+    "Image": "Image",
+    "ImageOfUI": "UI {$Logger.Title.Image}",
+    "ImageOfCursor": "Cursor {$Logger.Title.Image}",
+    "ImageOfSplash": "Splash {$Logger.Title.Image}",
+    "Sound": "Sound",
+    "Font": "Font"
+  },
+  "Sender": {
+    "GameName": "{$Game.GameName}",
+    "Warning": "Warning",
+    "Error": "ERROR"
+  },
+  "Message": {
+    "Loading": "Loading……",
+    "CheckLoadingAssets": "Check [{0}] : {1}",
+    "StartLoadingAssets": "Found {0} file(s), start to load",
+    "StopLoadingAssets": "Loading [{0}] succeeded",
+    "LoadingAssetsSucceeded": "Loaded {0} file(s)",
+    "LoadingAssetsFalied": "Loading [{0}] failed: {1}",
+    "LoadingAssetSucceeded": "Succeeded to load [{0}] ({1}/{2})",
+    "LoadingAssetFalied": "Failed to load [{0}] ({1}/{2})",
+    "InvalidAssetPath": "Invalid path or no exist file",
+    "NullArg_UIElement": "The arg \"UIElement\" is null"
+  }
+}

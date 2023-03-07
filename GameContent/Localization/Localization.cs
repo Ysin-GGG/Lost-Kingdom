@@ -10,8 +10,7 @@ namespace LostKingdom.GameContent.Localization
 {
     public static class Localization
     {
-        public static byte CurLangId = (byte)GameCulture.CultureInfo.Chinese;
-        public static Dictionary<string, string> RawText => Localization.Culture.Keys.Contains(Localization.CurLangId) ? Localization.Culture[Localization.CurLangId] : new Dictionary<string, string>();
+        public static Dictionary<string, string> RawText => Localization.Culture.Keys.Contains(Options.LanguageID) ? Localization.Culture[Options.LanguageID] : new Dictionary<string, string>();
         private static Dictionary<byte, Dictionary<string, string>> Culture;
 
         public static void Initialize()

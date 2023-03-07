@@ -342,6 +342,9 @@
         <member name="P:LostKingdom.Options.EffectVolume">
             <summary> 效果音量 </summary>
         </member>
+        <member name="P:LostKingdom.Options.LanguageID">
+            <summary> 当前使用的语言 </summary>
+        </member>
         <member name="P:LostKingdom.Options.ScreenResolutionNum">
             <summary> 当前使用的分辨率 </summary>
         </member>

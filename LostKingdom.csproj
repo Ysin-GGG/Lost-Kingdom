@@ -116,7 +116,6 @@
     <Content Include="GameThumbnail.png">
       <XnaPlatformSpecific>true</XnaPlatformSpecific>
     </Content>
-    <Content Include="Newtonsoft.Json.dll" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="LostKingdomContent\LostKingdomContent.contentproj">
