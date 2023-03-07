@@ -37,7 +37,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>.\</OutputPath>
+    <OutputPath>Game\</OutputPath>
     <DefineConstants>DEBUG;TRACE;WINDOWS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -123,11 +123,6 @@
       <Name>LostKingdomContent</Name>
       <XnaReferenceType>Content</XnaReferenceType>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="GameContent\Localization\zh-Hans\Game.json" />
-    <None Include="GameContent\Localization\zh-Hans\Logger.json" />
-    <None Include="GameContent\Localization\zh-Hans\PlayerInput.json" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="GameContent\Effects\" />

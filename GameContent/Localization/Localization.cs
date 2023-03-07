@@ -22,7 +22,7 @@ namespace LostKingdom.GameContent.Localization
 
         public static Dictionary<string, string> LoadCulture(GameCulture culture)
         {
-            string path = Path.Combine("GameContent\\Localization", culture.info);
+            string path = Path.Combine("Localization", culture.info);
             if (!Directory.Exists(path)) return null;
             Dictionary<string, string> dict = new Dictionary<string, string>();
             Queue<DirectoryInfo> queue = new Queue<DirectoryInfo>(30);
