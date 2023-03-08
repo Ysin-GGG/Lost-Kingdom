@@ -4,5 +4,11 @@
     "FPS": "帧率：{0}",
     "Memory": "内存占用：{0}",
     "ScreenSize": "窗口大小：{0} "
+  },
+  "ButtonText": {
+    "Play": "开始游戏",
+    "Library": "档案库",
+    "About": "关于我们",
+    "Exit": "退出游戏"
   }
 }

@@ -29,13 +29,24 @@ namespace LostKingdom
         public static float EffectVolume { get; set; } = 1f;
         /// <summary> 当前使用的语言 </summary>
         public static byte LanguageID { get; set; } = 2;
-        /// <summary> 当前使用的分辨率 </summary>
-        public static byte ScreenResolutionNum { get; set; } = 1;
+        /// <summary> 当前使用的分辨率类型 </summary>
+        public static byte ScreenResolutionNum
+        {
+            get
+            {
+                for (byte i = 0; i < Main.SupportedScreenResolution.Length; i++)
+                    if (Main.SupportedScreenResolution[i] == Main.ScreenSize) return i;
+                return 255;
+            }
+            set => Main.ScreenSize = Main.SupportedScreenResolution[value];
+        }
         /// <summary> 显示调试信息 </summary>
         public static bool ShowDebugMessage { get; set; } = true;
         /// <summary> 显示玩家设备输入 </summary>
         public static bool ShowPlayerInput { get; set; } = true;
-        /// <summary> 鼠标双击最大间隔（60=1000ms=1s） </summary>
+        /// <summary> 鼠标双击最大间隔（240=1000ms=1s） </summary>
         public static int DoubleClickDelay { get => Main.CurrInput.doubleClickDelay; set => Main.CurrInput.doubleClickDelay = value; }
+        /// <summary> 帧率（240=1000ms=1s） </summary>
+        public static int FramePerSecond { get => (int)(10_000_000u / Main.instance.TargetElapsedTime.Ticks); set => Main.instance.TargetElapsedTime = new TimeSpan(10_000_000u / MyMath.Clamp(value, 60, 240)); }
     }
 }

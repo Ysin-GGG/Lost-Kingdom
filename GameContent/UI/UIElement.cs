@@ -27,6 +27,8 @@ namespace LostKingdom.GameContent.UI
         public UIElement parent;
         /// <summary> 子UI </summary>
         public List<UIElement> children;
+        /// <summary> UI编号（不强求设定） </summary>
+        public int id;
         /// <summary> 是否持续刷新 </summary>
         public bool Active { get; set; }
         /// <summary> 是否可见 </summary>
@@ -39,10 +41,12 @@ namespace LostKingdom.GameContent.UI
         public bool IsParentSelected { get; private set; }
         /// <summary> 子UI是否被选中 </summary>
         public bool IsChildrenSelected { get; private set; }
-        /// <summary> 鼠标在该UI上 </summary>
+        /// <summary> 鼠标是否在该UI上 </summary>
         public bool IsMouseHovering { get; private set; }
-        /// <summary> 检测事件时忽略上方UI </summary>
+        /// <summary> 检测事件时是否忽略上方UI </summary>
         public bool IgnoreLayer { get; set; }
+        /// <summary> 是否可越出窗口边界 </summary>
+        public bool IgnoreBorder { get; set; }
         /// <summary> UI相对亲UI坐标 </summary>
         public Rectangle Bounds
         {
@@ -55,7 +59,6 @@ namespace LostKingdom.GameContent.UI
                 this.size.Y = value.Height;
             }
         }
-        private int doubleClickDelay;
 
         public Vector2 TopLeft => Utils.Utils.GetPoint(this.Bounds, 0, 0);
         public Vector2 Top => Utils.Utils.GetPoint(this.Bounds, 1, 0);
@@ -112,6 +115,7 @@ namespace LostKingdom.GameContent.UI
                 Vector2 currMousePos = new Vector2(Main.CurrInput.currMouseState.X, Main.CurrInput.currMouseState.Y);
                 Vector2 lastMousePos = new Vector2(Main.CurrInput.lastMouseState.X, Main.CurrInput.lastMouseState.Y);
                 int wheelOffset = Main.CurrInput.currMouseState.ScrollWheelValue - Main.CurrInput.currMouseState.ScrollWheelValue;
+
                 bool[] currButtons = new bool[3]
                 {
                     Main.CurrInput.currMouseState.LeftButton == ButtonState.Pressed,
@@ -128,34 +132,31 @@ namespace LostKingdom.GameContent.UI
                 bool lastButton = lastButtons.Contains(true);
                 MouseEvent diff = new MouseEvent(currMousePos - lastMousePos, wheelOffset, currButton);
 
-                if (currMousePos != lastMousePos)
+                Rectangle rect = this.Bounds;
+                rect.X = (int)(rect.X * Options.UIScale);
+                rect.Y = (int)(rect.Y * Options.UIScale);
+                rect.Width = (int)(rect.Width * Options.UIScale);
+                rect.Height = (int)(rect.Height * Options.UIScale);
+                bool containCurr = rect.Contains(currMousePos.ToPoint());
+                bool containLast = rect.Contains(lastMousePos.ToPoint());
+                if (containCurr && !containLast || !this.IsMouseHovering && containCurr)
                 {
-                    Rectangle rect = this.Bounds;
-                    rect.X = (int)(rect.X * Options.UIScale);
-                    rect.Y = (int)(rect.Y * Options.UIScale);
-                    rect.Width = (int)(rect.Width * Options.UIScale);
-                    rect.Height = (int)(rect.Height * Options.UIScale);
-                    bool containCurr = rect.Contains(currMousePos.ToPoint());
-                    bool containLast = rect.Contains(lastMousePos.ToPoint());
-                    if (containCurr && !containLast)
-                    {
-                        this.IsMouseHovering = true;
-                        this.MouseEnter?.Invoke(this, diff);
-                    }
-                    if (containLast && !containCurr)
-                    {
-                        this.IsMouseHovering = false;
-                        this.MouseLeave?.Invoke(this, diff);
-                    }
-                    if (this.IsMouseHovering)
-                    {
-                        if (currButton && !lastButton) this.MouseDown?.Invoke(this, diff);
-                        if (lastButton && !currButton) this.MouseUp?.Invoke(this, diff);
-                        if (lastButtons[0] && !currButtons[0]) this.MouseClick?.Invoke(this, diff);
-                        if (lastButtons[1] && !currButtons[1]) this.MouseMiddleClick?.Invoke(this, diff);
-                        if (lastButtons[2] && !currButtons[2]) this.MouseRightClick?.Invoke(this, diff);
-                        if (wheelOffset != 0) this.MouseWheel(this, diff);
-                    }
+                    this.IsMouseHovering = true;
+                    this.MouseEnter?.Invoke(this, diff);
+                }
+                if (containLast && !containCurr || this.IsMouseHovering && !containCurr)
+                {
+                    this.IsMouseHovering = false;
+                    this.MouseLeave?.Invoke(this, diff);
+                }
+                if (this.IsMouseHovering)
+                {
+                    if (currButton && !lastButton) this.MouseDown?.Invoke(this, diff);
+                    if (lastButton && !currButton) this.MouseUp?.Invoke(this, diff);
+                    if (lastButtons[0] && !currButtons[0]) this.MouseClick?.Invoke(this, diff);
+                    if (lastButtons[1] && !currButtons[1]) this.MouseMiddleClick?.Invoke(this, diff);
+                    if (lastButtons[2] && !currButtons[2]) this.MouseRightClick?.Invoke(this, diff);
+                    if (wheelOffset != 0) this.MouseWheel(this, diff);
                 }
             }
             this.UpdateUI(gameTime);

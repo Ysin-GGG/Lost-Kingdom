@@ -23,18 +23,6 @@ namespace LostKingdom.GameContent.UI
             this.size.Y /= 2.0f;
         }
 
-        protected sealed override void UpdateUI(GameTime gameTime)
-        {
-        }
-        
-        protected override void OnMouseDown(UIElement e, MouseEvent evt)
-        {
-        }
-
-        protected override void OnMouseEnter(UIElement e, MouseEvent evt)
-        {
-        }
-
         protected sealed override void DrawUI(SpriteBatch spriteBatch)
         {
             if (this.image != null) spriteBatch.Draw(this.image, this.location * Options.UIScale, this.image.Frame(0, this.IsMouseHovering ? 1 : 0, 1, 2), this.color, 0f, Vector2.Zero, this.scale * Options.UIScale, 0, 0f);

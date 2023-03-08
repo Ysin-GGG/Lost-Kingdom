@@ -40,6 +40,14 @@
         <member name="M:LostKingdom.GameContent.Card.DrawSelfBattle(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
             <summary> 在战斗时的绘制 </summary>
         </member>
+        <member name="T:LostKingdom.GameContent.Localization.Localization">
+            <summary> 游戏本地化 </summary>
+        </member>
+        <member name="M:LostKingdom.GameContent.Localization.Localization.GetText(System.String,System.Object[])">
+            <summary> 获取第一个包含关键字的对应文本 </summary>
+            <param name="key"> 关键字（完整格式：文件名.关键字） </param>
+            <param name="args"> 格式化输出的对象 </param>
+        </member>
         <member name="F:LostKingdom.GameContent.PlayerInput.InputState.Down">
             <summary> 按下时 </summary>
         </member>
@@ -51,6 +59,43 @@
         </member>
         <member name="F:LostKingdom.GameContent.PlayerInput.InputState.Released">
             <summary> 放开 </summary>
+        </member>
+        <member name="F:LostKingdom.GameContent.PlayerInput.Mouses.XButton1">
+            <summary> X1键（前进键） </summary>
+        </member>
+        <member name="F:LostKingdom.GameContent.PlayerInput.Mouses.XButton2">
+            <summary> X2键（前进键） </summary>
+        </member>
+        <member name="F:LostKingdom.GameContent.PlayerInput.Mouses.LeftButton">
+            <summary> 左键 </summary>
+        </member>
+        <member name="F:LostKingdom.GameContent.PlayerInput.Mouses.MiddleButton">
+            <summary> 中键 </summary>
+        </member>
+        <member name="F:LostKingdom.GameContent.PlayerInput.Mouses.RightButton">
+            <summary> 右键 </summary>
+        </member>
+        <member name="M:LostKingdom.GameContent.PlayerInput.GetInputCombination(Microsoft.Xna.Framework.Input.KeyState,Microsoft.Xna.Framework.Input.Keys[])">
+            <summary> 查看键盘是否形成特定组合输入 </summary>
+            <param name="state"> 键状态 </param>
+            <param name="keys"> 要组合的所有键 </param>
+        </member>
+        <member name="M:LostKingdom.GameContent.PlayerInput.GetInputCombination(Microsoft.Xna.Framework.Input.ButtonState,Microsoft.Xna.Framework.Input.Buttons[])">
+            <summary> 查看手柄是否形成特定组合输入 </summary>
+            <param name="state"> 按钮状态 </param>
+            <param name="buttons"> 要组合的所有按钮 </param>
+        </member>
+        <member name="M:LostKingdom.GameContent.PlayerInput.GetInputState(LostKingdom.GameContent.PlayerInput.Mouses)">
+            <summary> 获取鼠标某个键的状态 </summary>
+            <param name="button"> 键位 </param>
+        </member>
+        <member name="M:LostKingdom.GameContent.PlayerInput.GetInputState(Microsoft.Xna.Framework.Input.Keys)">
+            <summary> 获取键盘某个键的状态 </summary>
+            <param name="key"> 键位 </param>
+        </member>
+        <member name="M:LostKingdom.GameContent.PlayerInput.GetInputState(Microsoft.Xna.Framework.Input.Buttons)">
+            <summary> 获取手柄某个按钮的状态 </summary>
+            <param name="button"> 按钮 </param>
         </member>
         <member name="T:LostKingdom.GameContent.UI.UIElement">
             <summary> UI组件 </summary>
@@ -73,6 +118,9 @@
         <member name="F:LostKingdom.GameContent.UI.UIElement.children">
             <summary> 子UI </summary>
         </member>
+        <member name="F:LostKingdom.GameContent.UI.UIElement.id">
+            <summary> UI编号（不强求设定） </summary>
+        </member>
         <member name="P:LostKingdom.GameContent.UI.UIElement.Active">
             <summary> 是否持续刷新 </summary>
         </member>
@@ -92,10 +140,13 @@
             <summary> 子UI是否被选中 </summary>
         </member>
         <member name="P:LostKingdom.GameContent.UI.UIElement.IsMouseHovering">
-            <summary> 鼠标在该UI上 </summary>
+            <summary> 鼠标是否在该UI上 </summary>
         </member>
         <member name="P:LostKingdom.GameContent.UI.UIElement.IgnoreLayer">
-            <summary> 检测事件时忽略上方UI </summary>
+            <summary> 检测事件时是否忽略上方UI </summary>
+        </member>
+        <member name="P:LostKingdom.GameContent.UI.UIElement.IgnoreBorder">
+            <summary> 是否可越出窗口边界 </summary>
         </member>
         <member name="P:LostKingdom.GameContent.UI.UIElement.Bounds">
             <summary> UI相对亲UI坐标 </summary>
@@ -136,26 +187,28 @@
         <member name="F:LostKingdom.GameContent.UI.UIImage.UIImageDrawStyle.Full">
             <summary> 拉伸铺满整个UI </summary>
         </member>
-        <member name="T:LostKingdom.GameContent.UI.UILayer.DrawUserInterface">
-            <summary> UI图层绘制 </summary>
+        <member name="T:LostKingdom.GameContent.UI.UILayer">
+            <summary> UI图层 </summary>
         </member>
-        <member name="M:LostKingdom.GameContent.UI.UILayer.DrawUserInterface.Draw_UI_1_Background(Microsoft.Xna.Framework.Graphics.SpriteBatch,System.Boolean)">
-            <summary> 图层：背景图 </summary>
+        <member name="F:LostKingdom.GameContent.UI.UILayer.name">
+            <summary> 图层名 </summary>
         </member>
-        <member name="M:LostKingdom.GameContent.UI.UILayer.DrawUserInterface.Draw_UI_2_MainElements(Microsoft.Xna.Framework.Graphics.SpriteBatch,System.Boolean)">
-            <summary> 图层：主界面UI </summary>
+        <member name="F:LostKingdom.GameContent.UI.UILayer.depth">
+            <summary> 图层深度（绘制顺序：深→浅） </summary>
         </member>
-        <member name="M:LostKingdom.GameContent.UI.UILayer.DrawUserInterface.Draw_UI_29_Splash(Microsoft.Xna.Framework.Graphics.SpriteBatch,System.Boolean)">
-            <summary> 图层：主界面标题 </summary>
+        <member name="F:LostKingdom.GameContent.UI.UILayer.active">
+            <summary> 是否保持UI组件刷新 </summary>
         </member>
-        <member name="M:LostKingdom.GameContent.UI.UILayer.DrawUserInterface.Draw_UI_30_PlayerInput(Microsoft.Xna.Framework.Graphics.SpriteBatch,System.Boolean)">
-            <summary> 图层：玩家输入设备信息 </summary>
+        <member name="F:LostKingdom.GameContent.UI.UILayer.visible">
+            <summary> 是否绘制该图层 </summary>
         </member>
-        <member name="M:LostKingdom.GameContent.UI.UILayer.DrawUserInterface.Draw_UI_31_DebugMsg(Microsoft.Xna.Framework.Graphics.SpriteBatch,System.Boolean)">
-            <summary> 图层：Debug信息 </summary>
+        <member name="F:LostKingdom.GameContent.UI.UILayer.origin">
+            <summary> UI组件搭载器 </summary>
         </member>
-        <member name="M:LostKingdom.GameContent.UI.UILayer.DrawUserInterface.Draw_UI_32_Cursor(Microsoft.Xna.Framework.Graphics.SpriteBatch,System.Boolean)">
-            <summary> 图层：光标 </summary>
+        <member name="M:LostKingdom.GameContent.UI.UILayer.#ctor(System.String,System.Single)">
+            <summary> 插入UI图层 </summary>
+            <param name="name"></param>
+            <param name="depth"></param>
         </member>
         <member name="F:LostKingdom.GameContent.UI.UIPanel.back">
             <summary> 背景框 </summary>
@@ -276,6 +329,9 @@
         <member name="F:LostKingdom.Main.instance">
             <summary> Main实例 </summary>
         </member>
+        <member name="F:LostKingdom.Main.form">
+            <summary> Main实例 </summary>
+        </member>
         <member name="P:LostKingdom.Main.SupportedScreenResolution">
             <summary> 可选的分辨率 </summary>
         </member>
@@ -321,6 +377,9 @@
         <member name="F:LostKingdom.Main.Memory">
             <summary> 占用的运存 </summary>
         </member>
+        <member name="F:LostKingdom.Main.GameUpdate">
+            <summary> 逻辑刷新（锁60帧） </summary>
+        </member>
         <member name="F:LostKingdom.Main.isFullScreen">
             <summary> 当前是否全屏 </summary>
         </member>
@@ -346,7 +405,7 @@
             <summary> 当前使用的语言 </summary>
         </member>
         <member name="P:LostKingdom.Options.ScreenResolutionNum">
-            <summary> 当前使用的分辨率 </summary>
+            <summary> 当前使用的分辨率类型 </summary>
         </member>
         <member name="P:LostKingdom.Options.ShowDebugMessage">
             <summary> 显示调试信息 </summary>
@@ -355,7 +414,10 @@
             <summary> 显示玩家设备输入 </summary>
         </member>
         <member name="P:LostKingdom.Options.DoubleClickDelay">
-            <summary> 鼠标双击最大间隔（60=1000ms=1s） </summary>
+            <summary> 鼠标双击最大间隔（240=1000ms=1s） </summary>
+        </member>
+        <member name="P:LostKingdom.Options.FramePerSecond">
+            <summary> 帧率（240=1000ms=1s） </summary>
         </member>
         <member name="M:LostKingdom.Program.Main(System.String[])">
             <summary>

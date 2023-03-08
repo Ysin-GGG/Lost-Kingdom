@@ -8,9 +8,10 @@ using System.Text;
 
 namespace LostKingdom.GameContent.Localization
 {
+    /// <summary> 游戏本地化 </summary>
     public static class Localization
     {
-        public static Dictionary<string, string> RawText => Localization.Culture.Keys.Contains(Options.LanguageID) ? Localization.Culture[Options.LanguageID] : new Dictionary<string, string>();
+        private static Dictionary<string, string> RawText => Localization.Culture.Keys.Contains(Options.LanguageID) ? Localization.Culture[Options.LanguageID] : new Dictionary<string, string>();
         private static Dictionary<byte, Dictionary<string, string>> Culture;
 
         public static void Initialize()
@@ -57,6 +58,9 @@ namespace LostKingdom.GameContent.Localization
             else dict.Add($"{key}.{jo.Parent.Path}".Trim('.'), jo.ToString());
         }
 
+        /// <summary> 获取第一个包含关键字的对应文本 </summary>
+        /// <param name="key"> 关键字（完整格式：文件名.关键字） </param>
+        /// <param name="args"> 格式化输出的对象 </param>
         public static string GetText(string key, params object[] args)
         {
             if (Localization.RawText == null) return key;

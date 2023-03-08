@@ -45,10 +45,24 @@ namespace LostKingdom.GameContent
             Released,
         }
 
-        public PlayerInput(PlayerIndex who = PlayerIndex.One, int doubleClickDelay = 30)
+        public enum Mouses
+        {
+            /// <summary> X1键（前进键） </summary>
+            XButton1 = 1,
+            /// <summary> X2键（前进键） </summary>
+            XButton2 = 2,
+            /// <summary> 左键 </summary>
+            LeftButton = 4,
+            /// <summary> 中键 </summary>
+            MiddleButton = 8,
+            /// <summary> 右键 </summary>
+            RightButton = 16,
+        }
+        
+        public PlayerInput(PlayerIndex who = PlayerIndex.One, int doubleClickDelay = -1)
         {
             this.index = who;
-            this.doubleClickDelay = doubleClickDelay;
+            this.doubleClickDelay = doubleClickDelay < 0 ? Options.FramePerSecond / 2 : doubleClickDelay;
             this.currMouseState = this.lastMouseState = Mouse.GetState();
             this.currGamePadState = this.lastGamePadState = GamePad.GetState(who);
             this.currKeyboardState = this.lastKeyboardState = Keyboard.GetState(who);
@@ -60,7 +74,10 @@ namespace LostKingdom.GameContent
             this.focusUI = null;
         }
 
-        public bool GetKeyboardCombination(KeyState state, params Keys[] keys)
+        /// <summary> 查看键盘是否形成特定组合输入 </summary>
+        /// <param name="state"> 键状态 </param>
+        /// <param name="keys"> 要组合的所有键 </param>
+        public bool GetInputCombination(KeyState state, params Keys[] keys)
         {
             if (state == KeyState.Down)
                 foreach (Keys key in keys)
@@ -71,7 +88,10 @@ namespace LostKingdom.GameContent
             return true;
         }
 
-        public bool GetGamePadCombination(ButtonState state, params Buttons[] buttons)
+        /// <summary> 查看手柄是否形成特定组合输入 </summary>
+        /// <param name="state"> 按钮状态 </param>
+        /// <param name="buttons"> 要组合的所有按钮 </param>
+        public bool GetInputCombination(ButtonState state, params Buttons[] buttons)
         {
             if (state == ButtonState.Pressed)
                 foreach (Buttons button in buttons)
@@ -82,6 +102,18 @@ namespace LostKingdom.GameContent
             return true;
         }
 
+        /// <summary> 获取鼠标某个键的状态 </summary>
+        /// <param name="button"> 键位 </param>
+        public InputState GetInputState(Mouses button)
+        {
+            bool curr = this.IsButtonDown(this.currMouseState, button);
+            bool last = this.IsButtonDown(this.lastMouseState, button);
+            if (curr) return last ? InputState.Pressed : InputState.Down;
+            return !last ? InputState.Released : InputState.Up;
+        }
+
+        /// <summary> 获取键盘某个键的状态 </summary>
+        /// <param name="key"> 键位 </param>
         public InputState GetInputState(Keys key)
         {
             bool curr = this.currKeyboardState.IsKeyDown(key);
@@ -90,6 +122,8 @@ namespace LostKingdom.GameContent
             return !last ? InputState.Released : InputState.Up;
         }
 
+        /// <summary> 获取手柄某个按钮的状态 </summary>
+        /// <param name="button"> 按钮 </param>
         public InputState GetInputState(Buttons button)
         {
             bool curr = this.currGamePadState.IsButtonDown(button);
@@ -97,8 +131,21 @@ namespace LostKingdom.GameContent
             if (curr) return last ? InputState.Pressed : InputState.Down;
             return !last ? InputState.Released : InputState.Up;
         }
+
+        private bool IsButtonDown(MouseState mouse, Mouses button)
+        {
+            switch (button)
+            {
+                case Mouses.XButton1: return mouse.XButton1 == ButtonState.Pressed;
+                case Mouses.XButton2: return mouse.XButton2 == ButtonState.Pressed;
+                case Mouses.LeftButton: return mouse.LeftButton == ButtonState.Pressed;
+                case Mouses.MiddleButton: return mouse.MiddleButton == ButtonState.Pressed;
+                case Mouses.RightButton: return mouse.RightButton == ButtonState.Pressed;
+            }
+            return false;
+        }
         
-        public void Update(GameTime gameTime)
+        internal void Update(GameTime gameTime)
         {
             List<string> msg = new List<string>();
             MouseState mouseCurr = this.currMouseState;
@@ -300,7 +347,7 @@ namespace LostKingdom.GameContent
                 this.opacity = 3f;
             }
 
-            if (this.opacity > 0.0f) this.opacity -= .05f;
+            if (this.opacity > 0.0f) this.opacity -= .02f;
             else
             {
                 this.mouseMsg = "";
@@ -315,7 +362,7 @@ namespace LostKingdom.GameContent
             this.currKeyboardState = Keyboard.GetState(this.index);
         }
 
-        public void DrawPlayerInput(SpriteBatch spriteBatch, Vector2 pos)
+        internal void DrawPlayerInput(SpriteBatch spriteBatch, Vector2 pos)
         {
             float offset = 1.2f;
             Vector2[] bpos = new Vector2[4]

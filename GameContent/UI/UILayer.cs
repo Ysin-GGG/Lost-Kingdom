@@ -6,160 +6,177 @@ using LostKingdom.Utils;
 
 namespace LostKingdom.GameContent.UI
 {
+    /// <summary> UI图层 </summary>
     public class UILayer
     {
+        /// <summary> 图层名 </summary>
         public string name;
-        public float layer;
-        public UIElement state;
+        /// <summary> 图层深度（绘制顺序：深→浅） </summary>
+        public float depth;
+        /// <summary> 是否保持UI组件刷新 </summary>
+        public bool active;
+        /// <summary> 是否绘制该图层 </summary>
+        public bool visible;
+        /// <summary> UI组件搭载器 </summary>
+        public readonly UIElement origin;
 
         public enum LayerName
         {
             Background = 1,
             MainElements = 2,
+            MainElements2 = 3,
             Splash = 29,
             PlayerInput = 30,
             DebugMsg = 31,
             Cursor = 32,
         }
 
-        public UILayer(string name, float layer)
+        /// <summary> 插入UI图层 </summary>
+        /// <param name="name"></param>
+        /// <param name="depth"></param>
+        public UILayer(string name, float depth)
         {
             this.name = name;
-            this.layer = layer;
-            this.state = null;
+            this.depth = depth;
+            this.active = true;
+            this.visible = true;
+            this.origin = new UIElement();
             Main.UIs.Add(this);
-            Main.UIs.Sort(new Comparison<UILayer>((a, b) => Math.Sign(a.layer - b.layer)));
+            Main.UIs.Sort(new Comparison<UILayer>((a, b) => Math.Sign(a.depth - b.depth)));
+            this.Initialize();
+        }
+
+        public virtual void Initialize()
+        {
+            Vector2 location = Vector2.Zero;
+            switch ((UILayer.LayerName)this.depth)
+            {
+                case UILayer.LayerName.Background:
+                    break;
+                case UILayer.LayerName.MainElements:
+                    this.origin.location = new Vector2(150.0f, Main.BestScreenHeight - 400.0f);
+                    string[] content =
+                    {
+                        Localization.Localization.GetText("Game.ButtonText.Play"),
+                        Localization.Localization.GetText("Game.ButtonText.Library"),
+                        Localization.Localization.GetText("Game.ButtonText.About"),
+                        Localization.Localization.GetText("Game.ButtonText.Exit"),
+                    };
+                    UIImageButton button1;
+                    foreach (string s in content)
+                    {
+                        button1 = new UIImageButton(Asset.UI["Button1"]);
+                        button1.AddTo(this.origin);
+                        button1.LocateToParent = location;
+                        if(s == content[3]) button1.MouseClick += new Action<UIElement, MouseEvent>((e, evt) => Main.instance.Exit());
+                        UIText text = new UIText(button1.size, s, Vector2.One * .75f, null, UIText.TextAlign.Center);
+                        text.AddTo(button1);
+                        text.LocateToParent = Vector2.Zero;
+                        location.Y += button1.size.Y + 10.0f;
+                    }
+                    button1 = new UIImageButton(Asset.UI["Button2"]);
+                    button1.AddTo(this.origin);
+                    button1.LocateToParent = location;
+                    break;
+                case UILayer.LayerName.MainElements2:
+                    this.visible = false;
+                    this.origin.location = new Vector2(Main.BestScreenWidth / 2 - 300.0f, 150.0f);
+                    UIImageButton button2;
+                    foreach (Vector2 resolution in Main.SupportedScreenResolution)
+                    {
+                        button2 = new UIImageButton(Asset.UI["Button1"]);
+                        button2.AddTo(this.origin);
+                        button2.id = this.origin.children.Count;
+                        button2.LocateToParent = location;
+                        button2.MouseClick += new Action<UIElement, MouseEvent>((e, evt) => Options.ScreenResolutionNum = (byte)e.id);
+                        UIText text = new UIText(button2.size, $"{resolution.X}x{resolution.Y}", Vector2.One * .75f, null, UIText.TextAlign.Center);
+                        text.AddTo(button2);
+                        text.LocateToParent = Vector2.Zero;
+                        location.Y += button2.size.Y + 10.0f;
+                    }
+                    break;
+                case UILayer.LayerName.Splash:
+                    break;
+                case UILayer.LayerName.PlayerInput:
+                    break;
+                case UILayer.LayerName.DebugMsg:
+                    break;
+                case UILayer.LayerName.Cursor:
+                    break;
+            }
         }
 
         public virtual void UpdateUI(GameTime gameTime)
         {
-            this.state?.Update(gameTime);
+
+            switch ((UILayer.LayerName)this.depth)
+            {
+                case UILayer.LayerName.Background:
+                    break;
+                case UILayer.LayerName.MainElements:
+                    break;
+                case UILayer.LayerName.MainElements2:
+                    this.active = this.visible;
+                    break;
+                case UILayer.LayerName.Splash:
+                    this.visible = !Main.UIs[(int)UILayer.LayerName.MainElements2 - 1].visible;
+                    break;
+                case UILayer.LayerName.PlayerInput:
+                    break;
+                case UILayer.LayerName.DebugMsg:
+                    break;
+                case UILayer.LayerName.Cursor:
+                    break;
+            }
         }
 
         public virtual void Draw(SpriteBatch spriteBatch)
         {
-            UIElement ui = null;
-            bool init = this.state == null;
-            switch ((UILayer.LayerName)this.layer)
+            Vector2 location = Vector2.Zero;
+            switch ((UILayer.LayerName)this.depth)
             {
                 case UILayer.LayerName.Background:
-                    ui = DrawUserInterface.Draw_UI_1_Background(spriteBatch, init);
+                    spriteBatch.Draw(Asset.Splash["SplashBG"], new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), Color.White);
                     break;
                 case UILayer.LayerName.MainElements:
-                    ui = DrawUserInterface.Draw_UI_2_MainElements(spriteBatch, init);
+                    break;
+                case UILayer.LayerName.MainElements2:
                     break;
                 case UILayer.LayerName.Splash:
-                    ui = DrawUserInterface.Draw_UI_29_Splash(spriteBatch, init);
+                    Texture2D tex = Asset.Splash["Splash"];
+                    location = Main.ScreenSize * new Vector2(.5f, .3f);
+                    spriteBatch.Draw(tex, location, null, Color.White, 0.0f, tex.Center(), Options.UIScale, SpriteEffects.None, 0.0f);
+                    spriteBatch.Draw(Asset.Image["Pixel"], new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), Color.Black * (1f - Main.screenOpacity));
                     break;
                 case UILayer.LayerName.PlayerInput:
-                    ui = DrawUserInterface.Draw_UI_30_PlayerInput(spriteBatch, init);
+                    if (Options.ShowPlayerInput) Main.playerInput[0].DrawPlayerInput(spriteBatch, Main.ScreenSize * new Vector2(0f, .99f));
                     break;
                 case UILayer.LayerName.DebugMsg:
-                    ui = DrawUserInterface.Draw_UI_31_DebugMsg(spriteBatch, init);
-                    break;
-                case UILayer.LayerName.Cursor:
-                    ui = DrawUserInterface.Draw_UI_32_Cursor(spriteBatch, init);
-                    break;
-            }
-            if (this.state == null) this.state = ui;
-            this.state?.Draw(spriteBatch);
-        }
-
-        /// <summary> UI图层绘制 </summary>
-        public static class DrawUserInterface
-        {
-            /// <summary> 图层：背景图 </summary>
-            public static UIElement Draw_UI_1_Background(SpriteBatch spriteBatch, bool init)
-            {
-                spriteBatch.Draw(Asset.Splash["SplashBG"], new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), Color.White);
-                return null;
-            }
-
-            /// <summary> 图层：主界面UI </summary>
-            public static UIElement Draw_UI_2_MainElements(SpriteBatch spriteBatch, bool init)
-            {
-                if (init)
-                {
-                    UIElement state = new UIElement(new Vector2(150.0f, Main.BestScreenHeight - 400.0f), Vector2.One);
-                    Vector2 location = Vector2.Zero;
-                    string[] content =
+                    if (Options.ShowDebugMessage)
                     {
-                        "开始游戏",
-                        "档案库",
-                        "开发者信息",
-                        "退出",
-                    };
-                    foreach (string s in content)
-                    {
-                        UIImageButton button = new UIImageButton(Asset.UI["Button1"]);
-                        button.AddTo(state);
-                        button.LocateToParent = location;
-                        UIText text = new UIText(button.size, s, Vector2.One * .75f, null, UIText.TextAlign.Center);
-                        text.AddTo(button);
-                        text.LocateToParent = Vector2.Zero;
-                        location.Y += button.size.Y + 10.0f;
-                    }
-                    return state;
-                }
-                return null;
-            }
-
-            /// <summary> 图层：主界面标题 </summary>
-            public static UIElement Draw_UI_29_Splash(SpriteBatch spriteBatch, bool init)
-            {
-                Texture2D tex = Asset.Splash["Splash"];
-                Vector2 pos = (Main.BestScreenSize - tex.Size()) / 2f;
-                pos.Y -= 200f;
-                spriteBatch.Draw(tex, pos * Options.UIScale, null, Color.White, 0.0f, Vector2.Zero, Options.UIScale, SpriteEffects.None, 0.0f);
-                spriteBatch.Draw(Asset.Image["Pixel"], new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), Color.Black * (1f - Main.screenOpacity));
-                return null;
-            }
-
-            /// <summary> 图层：玩家输入设备信息 </summary>
-            public static UIElement Draw_UI_30_PlayerInput(SpriteBatch spriteBatch, bool init)
-            {
-                if (Options.ShowPlayerInput) Main.playerInput[0].DrawPlayerInput(spriteBatch, new Vector2(0f, Main.screenHeight - 18f));
-                return null;
-            }
-
-            /// <summary> 图层：Debug信息 </summary>
-            public static UIElement Draw_UI_31_DebugMsg(SpriteBatch spriteBatch, bool init)
-            {
-                if (Options.ShowDebugMessage)
-                {
-                    float offset = 2f * Options.UIScale;
-                    string msg = string.Join("\n",
-                        Localization.Localization.GetText("Game.Debug.FPS", Main.FPS),
-                        Localization.Localization.GetText("Game.Debug.Memory", Utils.Utils.ConvertMemory(Main.Memory)),
-                        Localization.Localization.GetText("Game.Debug.ScreenSize", string.Format("{0}x{1}", Main.screenWidth, Main.screenHeight))
-                        );
-                    Vector2 pos = new Vector2();
-                    Vector2[] bpos = new Vector2[4]
-                    {
+                        float offset = 2f * Options.UIScale;
+                        string msg = string.Join("\n",
+                            Localization.Localization.GetText("Game.Debug.FPS", Main.FPS),
+                            Localization.Localization.GetText("Game.Debug.Memory", Utils.Utils.ConvertMemory(Main.Memory)),
+                            Localization.Localization.GetText("Game.Debug.ScreenSize", string.Format("{0}x{1}", Main.screenWidth, Main.screenHeight))
+                            );
+                        Vector2[] bpos = new Vector2[4]
+                        {
                         new Vector2(offset, offset),
                         new Vector2(-offset, offset),
                         new Vector2(-offset, -offset),
                         new Vector2(offset, -offset),
-                    };
-                    for (int i = 0; i < 4; i++)
-                        Drawing.DrawColorfulString(spriteBatch, msg, pos + bpos[i], Vector2.One, 0, 0, .4f, Color.Black);
-                    Drawing.DrawColorfulString(spriteBatch, msg, pos, Vector2.One, Main.timer * 16, 16, 1f, Main.rainbow_raw);
-                }
-                return null;
-            }
-
-            /// <summary> 图层：光标 </summary>
-            public static UIElement Draw_UI_32_Cursor(SpriteBatch spriteBatch, bool init)
-            {
-                //if (Main.Bounds.Contains((Main.MouseScreen + Main.Bounds.TopLeft()).ToPoint()))
-                {
+                        };
+                        for (int i = 0; i < 4; i++)
+                            Drawing.DrawColorfulString(spriteBatch, msg, location + bpos[i], Vector2.One, 0, 0, .4f, Color.Black);
+                        Drawing.DrawColorfulString(spriteBatch, msg, location, Vector2.One, Main.timer * 16, 16, 1f, Main.rainbow_raw);
+                    }
+                    break;
+                case UILayer.LayerName.Cursor:
                     Texture2D cursor = Asset.Cursor["Cursor2"];
-                    //spriteBatch.Draw(cursor, Main.MouseScreen, new Rectangle(0, cursor.Height / 2, cursor.Width, cursor.Height / 2), Color.White, 0, Vector2.Zero, .33f, SpriteEffects.None, 0f);
                     spriteBatch.Draw(cursor, Main.MouseScreen, null, Color.White, 0f, Vector2.Zero, Options.UIScale, SpriteEffects.None, 0f);
-                }
-                return null;
+                    break;
             }
         }
     }
-
 }

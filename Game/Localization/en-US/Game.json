@@ -4,5 +4,11 @@
     "FPS": "FPS: {0}",
     "Memory": "Memory Usage: {0}",
     "ScreenSize": "Screen Size: {0}"
+  },
+  "ButtonText": {
+    "Play": "Play",
+    "Library": "Library",
+    "About": "About us",
+    "Exit": "Exit"
   }
 }
