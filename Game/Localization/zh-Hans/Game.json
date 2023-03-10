@@ -9,6 +9,8 @@
     "Play": "开始游戏",
     "Library": "档案库",
     "About": "关于我们",
-    "Exit": "退出游戏"
+    "Exit": "退出游戏",
+    "Settings": "设置",
+    "Controls": "控制"
   }
 }

@@ -124,8 +124,14 @@
         <member name="P:LostKingdom.GameContent.UI.UIElement.Active">
             <summary> 是否持续刷新 </summary>
         </member>
+        <member name="P:LostKingdom.GameContent.UI.UIElement.ChildrenActive">
+            <summary> 子UI是否持续刷新 </summary>
+        </member>
         <member name="P:LostKingdom.GameContent.UI.UIElement.Visible">
             <summary> 是否可见 </summary>
+        </member>
+        <member name="P:LostKingdom.GameContent.UI.UIElement.ChildrenVisible">
+            <summary> 子UI是否可见 </summary>
         </member>
         <member name="P:LostKingdom.GameContent.UI.UIElement.Dragging">
             <summary> 是否在拖动中 </summary>
@@ -237,6 +243,18 @@
             <param name="front"> 前景框（常规，鼠标悬浮，被选中） </param>
             <param name="corner"> 裁剪角的尺寸 </param>
         </member>
+        <member name="F:LostKingdom.GameContent.UI.UITab.name">
+            <summary> 标签名（将会绘制在窗口上） </summary>
+        </member>
+        <member name="F:LostKingdom.GameContent.UI.UITab.Draw">
+            <summary> 外部绘制委托（Vector2为UI相对于窗口的坐标） </summary>
+        </member>
+        <member name="M:LostKingdom.GameContent.UI.UITab.DrawUI(Microsoft.Xna.Framework.Graphics.SpriteBatch)">
+            <summary> 绘制你要在窗口上内容 </summary>
+        </member>
+        <member name="T:LostKingdom.GameContent.UI.UITabbedPane">
+            <summary> 选项卡窗口 </summary>
+        </member>
         <member name="T:LostKingdom.GameContent.UI.UIText">
             <summary> UI文本 </summary>
         </member>
@@ -302,6 +320,9 @@
         <member name="F:LostKingdom.Main.versionNumber">
             <summary> 版本号 </summary>
         </member>
+        <member name="P:LostKingdom.Main.UIBestScreenSize">
+            <summary> UI缩放对应的预设分辨率 </summary>
+        </member>
         <member name="P:LostKingdom.Main.BestScreenSize">
             <summary> 预设分辨率 </summary>
         </member>
@@ -314,6 +335,9 @@
         <member name="P:LostKingdom.Main.Bounds">
             <summary> 窗口框 </summary>
         </member>
+        <member name="P:LostKingdom.Main.UIScreenSize">
+            <summary> UI缩放对应的当前分辨率 </summary>
+        </member>
         <member name="P:LostKingdom.Main.ScreenSize">
             <summary> 当前分辨率 </summary>
         </member>
@@ -325,6 +349,9 @@
         </member>
         <member name="F:LostKingdom.Main.gameMatrix">
             <summary> 视图矩阵 </summary>
+        </member>
+        <member name="F:LostKingdom.Main.uiScaleMatrix">
+            <summary> UI矩阵 </summary>
         </member>
         <member name="F:LostKingdom.Main.instance">
             <summary> Main实例 </summary>
@@ -423,6 +450,14 @@
             <summary>
             The main entry point for the application.
             </summary>
+        </member>
+        <member name="M:LostKingdom.Utils.Drawing.DrawBoxByCorner(Microsoft.Xna.Framework.Graphics.SpriteBatch,Microsoft.Xna.Framework.Graphics.Texture2D,Microsoft.Xna.Framework.Vector2,Microsoft.Xna.Framework.Vector2,System.Nullable{Microsoft.Xna.Framework.Color})">
+            <summary> 利用方框的一个直角绘制完整方框 </summary>
+            <param name="spriteBatch"></param>
+            <param name="corner"> 方框直角 </param>
+            <param name="pos"> 绘制坐标 </param>
+            <param name="size"> 方框尺寸 </param>
+            <param name="color"> 方框颜色 </param>
         </member>
         <member name="M:LostKingdom.Utils.Drawing.InitDrawString(Microsoft.Xna.Framework.Vector2,Microsoft.Xna.Framework.Vector2,Microsoft.Xna.Framework.Vector2,System.Nullable{Microsoft.Xna.Framework.Color},Microsoft.Xna.Framework.Graphics.SpriteFont,Microsoft.Xna.Framework.Graphics.SpriteBatch)">
             <summary> 初始化字符串绘制器 </summary>

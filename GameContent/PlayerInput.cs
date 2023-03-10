@@ -375,19 +375,19 @@ namespace LostKingdom.GameContent
             Color c1 = Color.Black * .25f * MyMath.Min(this.opacity, 1f);
             if (mouseMsg.Length > 0)
             {
-                pos.Y -= 22f * Options.UIScale;
+                pos.Y -= 22f;
                 string msg = Localization.Localization.GetText("PlayerInput.Mouse.Message", mouseMsg);
                 for (int i = 0; i < 4; i++)
-                    Drawing.DrawColorfulString(spriteBatch, msg, pos + bpos[i], new Vector2(1.01f), 0, 0, this.opacity, c1);
-                Drawing.DrawColorfulString(spriteBatch, msg, pos, Vector2.One, Main.timer * 16, 16, this.opacity, Main.rainbow_raw);
+                    Drawing.DrawColorfulString(spriteBatch, msg, pos + bpos[i], new Vector2(1.01f * Options.UIScale), 0, 0, this.opacity, c1);
+                Drawing.DrawColorfulString(spriteBatch, msg, pos, new Vector2(Options.UIScale), Main.timer * 16, 16, this.opacity, Main.rainbow_raw);
             }
             if (gamePadMsg.Length > 0)
             {
-                pos.Y -= 22f * Options.UIScale;
+                pos.Y -= 22f;
                 string msg = Localization.Localization.GetText("PlayerInput.GamePad.Message", gamePadMsg);
                 for (int i = 0; i < 4; i++)
-                    Drawing.DrawColorfulString(spriteBatch, msg, pos + bpos[i], new Vector2(1.01f), 0, 0, this.opacity, c1);
-                Drawing.DrawColorfulString(spriteBatch, msg, pos, Vector2.One, Main.timer * 16, 16, this.opacity, Main.rainbow_raw);
+                    Drawing.DrawColorfulString(spriteBatch, msg, pos + bpos[i], new Vector2(1.01f * Options.UIScale), 0, 0, this.opacity, c1);
+                Drawing.DrawColorfulString(spriteBatch, msg, pos, new Vector2(Options.UIScale), Main.timer * 16, 16, this.opacity, Main.rainbow_raw);
             }
         }
         

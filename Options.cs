@@ -28,7 +28,7 @@ namespace LostKingdom
         /// <summary> 效果音量 </summary>
         public static float EffectVolume { get; set; } = 1f;
         /// <summary> 当前使用的语言 </summary>
-        public static byte LanguageID { get; set; } = 2;
+        public static byte LanguageID { get; set; } = 1;
         /// <summary> 当前使用的分辨率类型 </summary>
         public static byte ScreenResolutionNum
         {

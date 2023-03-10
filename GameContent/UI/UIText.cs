@@ -64,17 +64,23 @@ namespace LostKingdom.GameContent.UI
             this.align = align;
         }
 
-        protected override void DrawUI(SpriteBatch spriteBatch)
+        protected unsafe override void DrawUI(SpriteBatch spriteBatch)
         {
             bool? draw = this.ModifyDrawText?.Invoke(spriteBatch, this);
             if (!draw.HasValue || !draw.Value)
             {
                 SpriteFont font = Main.MySpriteFont;
-                Vector2 size = font.MeasureString(this.text);
+                Vector2 size = font.MeasureString(this.text) * this.scale;
+                if (size.X > this.size.X)
+                {
+                    size.Y *= size.X / this.size.X;
+                    size.X = this.size.X;
+                    this.size.Y = size.Y / 2;
+                }
                 Vector2 pos = this.location;
-                pos.Y -= 2f;
+                pos.Y -= 2f * this.scale.Y;
 
-                switch(this.align)
+                switch (this.align)
                 {
                     case TextAlign.TopLeft:
                         break;
@@ -106,8 +112,8 @@ namespace LostKingdom.GameContent.UI
                         break;
                 }
 
-                Drawing.InitDrawString(pos, this.size, Vector2.One);
-                Drawing.InitDrawStringBack();
+                Drawing.InitDrawString(pos, this.size * scale, this.scale);
+                Drawing.InitDrawStringBack(1.5f, this.scale);
                 Drawing.DrawString(this.text);
             }
         }

@@ -179,7 +179,7 @@
     "OemClear": "254"
   },
   "GamePad": {
-    "Name": "GamePad",
+    "Name": "Gamepad",
     "Message": "{$PlayerInput.GamePad.Name}: {0}",
     "Connected": "Connected",
     "Disconnected": "Disconnected",

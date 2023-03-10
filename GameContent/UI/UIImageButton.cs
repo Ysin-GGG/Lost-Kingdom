@@ -25,7 +25,7 @@ namespace LostKingdom.GameContent.UI
 
         protected sealed override void DrawUI(SpriteBatch spriteBatch)
         {
-            if (this.image != null) spriteBatch.Draw(this.image, this.location * Options.UIScale, this.image.Frame(0, this.IsMouseHovering ? 1 : 0, 1, 2), this.color, 0f, Vector2.Zero, this.scale * Options.UIScale, 0, 0f);
+            if (this.image != null) spriteBatch.Draw(this.image, this.location, this.image.Frame(0, this.IsMouseHovering ? 1 : 0, 1, 2), this.color, 0f, Vector2.Zero, this.scale, 0, 0f);
         }
     }
 }

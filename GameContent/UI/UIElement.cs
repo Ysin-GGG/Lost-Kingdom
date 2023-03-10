@@ -31,8 +31,12 @@ namespace LostKingdom.GameContent.UI
         public int id;
         /// <summary> 是否持续刷新 </summary>
         public bool Active { get; set; }
+        /// <summary> 子UI是否持续刷新 </summary>
+        public bool ChildrenActive { get; set; }
         /// <summary> 是否可见 </summary>
         public bool Visible { get; set; }
+        /// <summary> 子UI是否可见 </summary>
+        public bool ChildrenVisible { get; set; }
         /// <summary> 是否在拖动中 </summary>
         public bool Dragging { get; private set; }
         /// <summary> 当前UI是否被选中 </summary>
@@ -159,16 +163,16 @@ namespace LostKingdom.GameContent.UI
                     if (wheelOffset != 0) this.MouseWheel(this, diff);
                 }
             }
-            this.UpdateUI(gameTime);
-            foreach (UIElement child in this.children) child.Update(gameTime);
+            if (this.Active) this.UpdateUI(gameTime);
+            if (this.ChildrenActive) foreach (UIElement child in this.children) child.Update(gameTime);
         }
 
         /// <summary> 绘制入口 </summary>
         /// <param name="spriteBatch"> 绘制精灵 </param>
         internal void Draw(SpriteBatch spriteBatch)
         {
-            this.DrawUI(spriteBatch);
-            foreach (UIElement child in this.children) child.Draw(spriteBatch);
+            if (this.Visible) this.DrawUI(spriteBatch);
+            if (this.ChildrenVisible) foreach (UIElement child in this.children) child.Draw(spriteBatch);
         }
 
         /// <summary> 刷新UI </summary>
@@ -184,7 +188,9 @@ namespace LostKingdom.GameContent.UI
             this.location = Vector2.Zero;
             this.size = Vector2.One;
             this.Active = true;
-            this.Visible = false;
+            this.Visible = true;
+            this.ChildrenActive = true;
+            this.ChildrenVisible = true;
             this.IgnoreLayer = false;
             this.parent = null;
             this.children = new List<UIElement>();
@@ -197,6 +203,8 @@ namespace LostKingdom.GameContent.UI
             this.size = size;
             this.Active = true;
             this.Visible = true;
+            this.ChildrenActive = true;
+            this.ChildrenVisible = true;
             this.IgnoreLayer = false;
             this.parent = null;
             this.children = new List<UIElement>();
@@ -253,5 +261,15 @@ namespace LostKingdom.GameContent.UI
             e.parent = this;
             this.children.Add(e);
         }
+
+        public void Move(Vector2 offset)
+        {
+            if (offset == Vector2.Zero) return;
+            this.location += offset;
+            foreach (UIElement child in this.children)
+                child.Move(offset);
+        }
+
+        public void MoveTo(Vector2 location) => this.Move(location - this.location);
     }
 }

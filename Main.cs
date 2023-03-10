@@ -31,7 +31,8 @@ namespace LostKingdom
         public static RenderTarget2D MyRenderTarget { get; set; }
         public static RenderTarget2D MyRenderTargetSwap { get; set; }
 
-
+        /// <summary> UI缩放对应的预设分辨率 </summary>
+        public static Vector2 UIBestScreenSize => Main.BestScreenSize / Options.UIScale;
         /// <summary> 预设分辨率 </summary>
         public static Vector2 BestScreenSize => new Vector2(BestScreenWidth, BestScreenHeight);
         /// <summary> 预设分辨率宽度 </summary>
@@ -40,12 +41,14 @@ namespace LostKingdom
         public static int BestScreenHeight => 1080;
         /// <summary> 窗口框 </summary>
         public static Rectangle Bounds => new Rectangle(Main.instance.Window.ClientBounds.X, Main.instance.Window.ClientBounds.Y, Main.screenWidth, Main.screenHeight);
+        /// <summary> UI缩放对应的当前分辨率 </summary>
+        public static Vector2 UIScreenSize => Main.ScreenSize / Options.UIScale;
         /// <summary> 当前分辨率 </summary>
         public static Vector2 ScreenSize
         {
             get
             {
-                Vector2 size = new Vector2();
+                Vector2 size = Vector2.Zero;
                 size.X = Main.screenWidth = Main.instance.GraphicsDevice.PresentationParameters.BackBufferWidth;
                 size.Y = Main.screenHeight = Main.instance.GraphicsDevice.PresentationParameters.BackBufferHeight;
                 return size;
@@ -79,6 +82,8 @@ namespace LostKingdom
         public static Logger logger = null;
         /// <summary> 视图矩阵 </summary>
         public static Matrix gameMatrix;
+        /// <summary> UI矩阵 </summary>
+        public static Matrix uiScaleMatrix;
         /// <summary> Main实例 </summary>
         public static Main instance = null;
         /// <summary> Main实例 </summary>
@@ -148,7 +153,6 @@ namespace LostKingdom
         {
             base.Initialize();
             Main.playerInput[0] = new PlayerInput(PlayerIndex.One, 20);
-            Main.gameMatrix = Matrix.Identity;
             Main.MySpriteBatch = new SpriteBatch(this.GraphicsDevice);
             Main.screenOffTime = -30;
             Main.screenOpacity = 0.0f;
@@ -159,6 +163,8 @@ namespace LostKingdom
             this.InitUserInterface();
             this.fpsTimer.Start();
             Options.FramePerSecond = 120;
+            Main.gameMatrix = Matrix.Identity;
+            Main.uiScaleMatrix = Matrix.CreateScale(Options.UIScale, Options.UIScale, 0.0f);
             this.Window.ClientSizeChanged += new EventHandler<EventArgs>(this.OnSizeChanged);
         }
 
@@ -174,10 +180,13 @@ namespace LostKingdom
         {
             List<Vector2> resolution = new List<Vector2>();
             foreach (DisplayMode mode in GraphicsAdapter.DefaultAdapter.SupportedDisplayModes)
-                resolution.Add(new Vector2(mode.Width, mode.Height));
+            {
+                Vector2 size = new Vector2(mode.Width, mode.Height);
+                if (size.X / size.Y >= 1.5f) resolution.Add(size);
+            }
             Main.SupportedScreenResolution = resolution.ToArray();
-            Point size = Main.SupportedScreenResolution.Last().ToPoint();
-            Main.form.MaximumSize = new System.Drawing.Size(size.X, size.Y);
+            Point maxSize = Main.SupportedScreenResolution.Last().ToPoint();
+            Main.form.MaximumSize = new System.Drawing.Size(maxSize.X, maxSize.Y);
             Main.ScreenSize = Main.SupportedScreenResolution[Main.SupportedScreenResolution.Length / 2];
         }
 
@@ -313,11 +322,14 @@ namespace LostKingdom
             }
             else this.fpsCounter++;
 
+            Main.uiScaleMatrix = Matrix.CreateScale(Options.UIScale, Options.UIScale, 0.0f);
             foreach (UILayer ui in Main.UIs)
             {
                 if (!ui.visible) continue;
-                Main.MySpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Main.gameMatrix);
+                Main.MySpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Matrix.Identity);
                 ui.Draw(Main.MySpriteBatch);
+                Main.MySpriteBatch.End();
+                Main.MySpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Main.uiScaleMatrix);
                 ui.origin?.Draw(Main.MySpriteBatch);
                 Main.MySpriteBatch.End();
             }
