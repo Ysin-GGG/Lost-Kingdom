@@ -62,9 +62,10 @@ namespace LostKingdom.GameContent.UI
             this.size = size;
             this.scale = scale;
             this.align = align;
+            this.IgnoreMe = true;
         }
 
-        protected unsafe override void DrawUI(SpriteBatch spriteBatch)
+        protected override void DrawUI(SpriteBatch spriteBatch)
         {
             bool? draw = this.ModifyDrawText?.Invoke(spriteBatch, this);
             if (!draw.HasValue || !draw.Value)

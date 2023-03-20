@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace LostKingdom.GameContent.Localization
 {
@@ -10,6 +6,7 @@ namespace LostKingdom.GameContent.Localization
     {
         public byte id;
         public string info;
+        public string key;
 
         public enum CultureInfo
         {
@@ -22,18 +19,19 @@ namespace LostKingdom.GameContent.Localization
         {
             {
                 CultureInfo.English,
-                new GameCulture(1, "en-US")
+                new GameCulture(1, "en-US", "English")
             },
             {
                 CultureInfo.Chinese,
-                new GameCulture(2, "zh-Hans")
+                new GameCulture(2, "zh-Hans", "简体中文")
             },
         };
 
-        public GameCulture(byte id, string info)
+        public GameCulture(byte id, string info, string nameKey = null)
         {
             this.id = id;
             this.info = info;
+            this.key = nameKey ?? "UserInterface.Options.Language.Unknown";
         }
     }
 }

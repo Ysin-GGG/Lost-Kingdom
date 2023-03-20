@@ -1,0 +1,26 @@
+{
+  "Card": {
+    "1": "唤雷术",
+    "2": "炽热领域",
+    "3": "火焰飞弹",
+    "4": "回溯",
+    "5": "静止",
+    "6": "飞跃"
+  },
+  "CardType": {
+    "Attack": "攻击",
+    "Skill": "技能",
+    "Action": "行动",
+    "Status": "状态",
+    "Curse": "诅咒"
+  },
+  "Effect": {
+    "Innate": "固有",
+    "Exhaustible": "消耗",
+    "Ethereal": "虚无",
+    "Quiescent": "滞留",
+    "Unusable": "锁定",
+    "Echoic": "先机",
+    "Broken": "损耗"
+  }
+}

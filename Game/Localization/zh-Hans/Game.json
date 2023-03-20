@@ -1,16 +1,16 @@
 {
   "GameName": "Lost Kingdom",
-  "Debug": {
-    "FPS": "帧率：{0}",
-    "Memory": "内存占用：{0}",
-    "ScreenSize": "窗口大小：{0} "
+  "Rarity": {
+    "Common": "常见",
+    "Uncommon": "罕见",
+    "Rare": "稀有",
+    "SuperRare": "非常稀有",
+    "ExtremeRare": "极其稀有"
   },
-  "ButtonText": {
-    "Play": "开始游戏",
-    "Library": "档案库",
-    "About": "关于我们",
-    "Exit": "退出游戏",
-    "Settings": "设置",
-    "Controls": "控制"
+  "Legacy": {
+    "CostHP": "消耗{0}点生命值",
+    "CostPercentHP": "消耗{0}%生命值",
+    "CostAP": "消耗{0}点行动力",
+    "CostPercentAP": "消耗{0}%行动力"
   }
 }

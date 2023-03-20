@@ -1,0 +1,45 @@
+{
+  "Main": {
+    "Play": "Play",
+    "Library": "Library",
+    "About": "About us",
+    "Exit": "Exit"
+  },
+  "Options": {
+    "Tab": {
+      "Settings": "Settings",
+      "Controls": "Controls"
+    },
+    "Volume": {
+      "Name": "Volume",
+      "MasterVolume": "Master",
+      "MusicVolume": "Music",
+      "SoundVolume": "Sound",
+      "AmbientVolume": "Ambient"
+    },
+    "ScreenResolution": {
+      "Name": "Resolution",
+      "Current": "Current {$UserInterface.Options.ScreenResolution.Name}",
+      "Value": "{0}x{1}",
+      "Windowing": "Windowing",
+      "Borderless": "Borderless",
+      "FullScreen": "Full Screen"
+    },
+    "FPS": {
+      "Name": "FPS",
+      "Current": "Current {$UserInterface.Options.FPS.Name}"
+    },
+    "Language": {
+      "Name": "Language",
+      "Current": "Current {$UserInterface.Options.Language.Name}",
+      "Unknown": "Unknown",
+      "English": "English",
+      "SimplifiedChinese": "Simplified Chinese（简体中文）"
+    }
+  },
+  "Debug": {
+    "FPS": "FPS: {0}",
+    "Memory": "Memory Usage: {0}",
+    "ScreenSize": "Screen Size: {0}"
+  }
+}

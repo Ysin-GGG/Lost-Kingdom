@@ -7,9 +7,9 @@ namespace LostKingdom.Utils
 {
     public class Logger
     {
-        public static readonly string SenderGameName = Localization.GetText("Logger.Sender.GameName");
-        public static readonly string WarningSender = Localization.GetText("Logger.Sender.Warning");
-        public static readonly string ErrorSender = Localization.GetText("Logger.Sender.Error");
+        public static readonly string SenderGameName = GameLocalization.GetText("Logger.Sender.GameName");
+        public static readonly string WarningSender = GameLocalization.GetText("Logger.Sender.Warning");
+        public static readonly string ErrorSender = GameLocalization.GetText("Logger.Sender.Error");
         public string Path { get; private set; }
         public string Name { get; set; }
 

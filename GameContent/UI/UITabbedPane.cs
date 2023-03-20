@@ -21,6 +21,7 @@ namespace LostKingdom.GameContent.UI
             this.panelBox = Asset.UI["UITabbedPanel1"];
             this.size = size;
             this.page = 0;
+            this.IgnoreMe = true;
         }
 
         public void AddTab(UITab tab)

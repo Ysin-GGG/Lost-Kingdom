@@ -6,6 +6,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
+using LostKingdom.GameContent.Localization;
 using LostKingdom.GameContent.UI;
 using LostKingdom.Utils;
 
@@ -23,6 +24,9 @@ namespace LostKingdom.GameContent
         public int doubleClickDelay;
         private int[] _doubleClickDelay;
         public UIElement focusUI;
+        public int[] mousePressingTime;
+        public int[] gamepadPressingTime;
+        public int[] keyboardPressingTime;
 
         public bool[] mouseState;
         public bool[] gamepadState;
@@ -33,6 +37,7 @@ namespace LostKingdom.GameContent
         public string gamePadMsg;
         public string keyboardMsg;
 
+        /// <summary> 按键状态 </summary>
         public enum InputState
         {
             /// <summary> 按下时 </summary>
@@ -45,6 +50,7 @@ namespace LostKingdom.GameContent
             Released,
         }
 
+        /// <summary> 鼠标键位 </summary>
         public enum Mouses
         {
             /// <summary> X1键（前进键） </summary>
@@ -59,6 +65,9 @@ namespace LostKingdom.GameContent
             RightButton = 16,
         }
         
+        /// <summary> 新建设备输入读取器 </summary>
+        /// <param name="who"> 玩家编号 </param>
+        /// <param name="doubleClickDelay"> 双击判定间隔 </param>
         public PlayerInput(PlayerIndex who = PlayerIndex.One, int doubleClickDelay = -1)
         {
             this.index = who;
@@ -67,6 +76,9 @@ namespace LostKingdom.GameContent
             this.currGamePadState = this.lastGamePadState = GamePad.GetState(who);
             this.currKeyboardState = this.lastKeyboardState = Keyboard.GetState(who);
             this._doubleClickDelay = new int[3];
+            this.mousePressingTime = new int[Enum.GetValues(typeof(Mouses)).Length];
+            this.gamepadPressingTime = new int[Enum.GetValues(typeof(Buttons)).Length];
+            this.keyboardPressingTime = new int[Enum.GetValues(typeof(Keys)).Length];
             this.opacity = 0f;
             this.mouseMsg = "";
             this.gamePadMsg = "";
@@ -144,7 +156,7 @@ namespace LostKingdom.GameContent
             }
             return false;
         }
-        
+
         internal void Update(GameTime gameTime)
         {
             List<string> msg = new List<string>();
@@ -152,76 +164,73 @@ namespace LostKingdom.GameContent
             MouseState mouseLast = this.lastMouseState;
             Vector2 mouseOffset = new Vector2(mouseCurr.X - mouseLast.X, mouseCurr.Y - mouseLast.Y);
             int wheelOffset = mouseCurr.ScrollWheelValue - mouseLast.ScrollWheelValue;
-            MouseEvent evt = new MouseEvent(mouseOffset, wheelOffset, true);
+            MouseEvent mouseEvt = new MouseEvent(mouseOffset, wheelOffset, false);
 
-            bool buttonCurr, buttonLast, down = false, up = false;
-            buttonCurr = mouseCurr.LeftButton == ButtonState.Pressed;
-            buttonLast = mouseLast.LeftButton == ButtonState.Pressed;
-            down |= buttonCurr && !buttonLast;
-            up |= buttonLast && !buttonCurr;
-            if (buttonLast && !buttonCurr)
+            bool down = false, up = false;
+            bool[] buttonCurr = new bool[3]
             {
-                this.MouseClick?.Invoke(this, evt);
-                if (this._doubleClickDelay[0] > 0)
+                mouseCurr.LeftButton == ButtonState.Pressed,
+                mouseCurr.MiddleButton == ButtonState.Pressed,
+                mouseCurr.RightButton == ButtonState.Pressed,
+            };
+            bool[] buttonLast = new bool[3]
+            {
+                mouseLast.LeftButton == ButtonState.Pressed,
+                mouseLast.MiddleButton == ButtonState.Pressed,
+                mouseLast.RightButton == ButtonState.Pressed,
+            };
+
+            string[][] _msg = new string[3][]
+            {
+                new string[2] { "PlayerInput.Mouse.LeftClick" , "PlayerInput.Mouse.LeftDoubleClick" },
+                new string[2] { "PlayerInput.Mouse.MiddleClick" , "PlayerInput.Mouse.MiddleDoubleClick" },
+                new string[2] { "PlayerInput.Mouse.RightClick" , "PlayerInput.Mouse.RightDoubleClick" },
+            };
+
+            for (int i = 0; i < 3; i++)
+            {
+                down |= buttonCurr[i] && !buttonLast[i];
+                up |= buttonLast[i] && !buttonCurr[i];
+                if (buttonLast[i] && !buttonCurr[i])
                 {
-                    msg.Add(Localization.Localization.GetText("PlayerInput.Mouse.LeftDoubleClick"));
-                    this.MouseClick2?.Invoke(this, evt);
-                    this._doubleClickDelay[0] = 0;
-                }
-                else
-                {
-                    msg.Add(Localization.Localization.GetText("PlayerInput.Mouse.LeftClick"));
-                    this._doubleClickDelay[0] = this.doubleClickDelay;
+                    MouseEvent _evt = new MouseEvent(mouseOffset, wheelOffset, true);
+                    switch (i)
+                    {
+                        case 0:
+                            mouseEvt.leftButton = true;
+                            _evt.leftButton = true;
+                            break;
+                        case 1:
+                            mouseEvt.middleButton = true;
+                            _evt.middleButton = true;
+                            break;
+                        case 2:
+                            mouseEvt.rightButton = true;
+                            _evt.rightButton = true;
+                            break;
+                    }
+                    this.MouseClick?.Invoke(this, _evt);
+                    if (this._doubleClickDelay[i] > 0)
+                    {
+                        msg.Add(GameLocalization.GetText(_msg[i][1]));
+                        this.MouseDoubleClick?.Invoke(this, _evt);
+                        this._doubleClickDelay[i] = 0;
+                    }
+                    else
+                    {
+                        msg.Add(GameLocalization.GetText(_msg[i][0]));
+                        this._doubleClickDelay[i] = this.doubleClickDelay;
+                    }
                 }
             }
 
-            buttonCurr = mouseCurr.MiddleButton == ButtonState.Pressed;
-            buttonLast = mouseLast.MiddleButton == ButtonState.Pressed;
-            down |= buttonCurr && !buttonLast;
-            up |= buttonLast && !buttonCurr;
-            if (buttonLast && !buttonCurr)
-            {
-                this.MouseMiddleClick?.Invoke(this, evt);
-                if (this._doubleClickDelay[1] > 0)
-                {
-                    msg.Add(Localization.Localization.GetText("PlayerInput.Mouse.MiddleDoubleClick"));
-                    this.MouseMiddleClick2?.Invoke(this, evt);
-                    this._doubleClickDelay[1] = 0;
-                }
-                else
-                {
-                    msg.Add(Localization.Localization.GetText("PlayerInput.Mouse.MiddleClick"));
-                    this._doubleClickDelay[1] = this.doubleClickDelay;
-                }
-            }
-
-            buttonCurr = mouseCurr.RightButton == ButtonState.Pressed;
-            buttonLast = mouseLast.RightButton == ButtonState.Pressed;
-            down |= buttonCurr && !buttonLast;
-            up |= buttonLast && !buttonCurr;
-            if (buttonLast && !buttonCurr)
-            {
-                this.MouseRightClick?.Invoke(this, evt);
-                if (this._doubleClickDelay[2] > 0)
-                {
-                    msg.Add(Localization.Localization.GetText("PlayerInput.Mouse.RightDoubleClick"));
-                    this.MouseRightClick2?.Invoke(this, evt);
-                    this._doubleClickDelay[2] = 0;
-                }
-                else
-                {
-                    msg.Add(Localization.Localization.GetText("PlayerInput.Mouse.RightClick"));
-                    this._doubleClickDelay[2] = this.doubleClickDelay;
-                }
-            }
-
-            if (down) this.MouseDown?.Invoke(this, evt);
-            if (up) this.MouseUp?.Invoke(this, evt);
+            if (down) this.MouseDown?.Invoke(this, mouseEvt);
+            if (up) this.MouseUp?.Invoke(this, mouseEvt);
 
             if (wheelOffset != 0)
             {
-                msg.Add(Localization.Localization.GetText(wheelOffset > 0 ? "PlayerInput.Mouse.WheelUp" : "PlayerInput.Mouse.WheelDown"));
-                this.MouseWheel?.Invoke(this, evt);
+                msg.Add(GameLocalization.GetText(wheelOffset > 0 ? "PlayerInput.Mouse.WheelUp" : "PlayerInput.Mouse.WheelDown"));
+                this.MouseWheel?.Invoke(this, mouseEvt);
             }
 
             for (int i = 0; i < 3; i++)
@@ -241,12 +250,12 @@ namespace LostKingdom.GameContent
             {
                 if (gamePadCurr.IsConnected && !gamePadLast.IsConnected)
                 {
-                    msg.Add(Localization.Localization.GetText("PlayerInput.GamePad.Connected"));
+                    msg.Add(GameLocalization.GetText("PlayerInput.GamePad.Connected"));
                     this.GamePadConnected?.Invoke(this, null);
                 }
                 if (gamePadLast.IsConnected && !gamePadCurr.IsConnected)
                 {
-                    msg.Add(Localization.Localization.GetText("PlayerInput.GamePad.Disconnected"));
+                    msg.Add(GameLocalization.GetText("PlayerInput.GamePad.Disconnected"));
                     this.GamePadDisconnected?.Invoke(this, null);
                 }
 
@@ -267,34 +276,34 @@ namespace LostKingdom.GameContent
                 string[,] txt = new string[3, 8]
                 {
                     {
-                        Localization.Localization.GetText("PlayerInput.GamePad.DirectionPadUpLeft"),
-                        Localization.Localization.GetText("PlayerInput.GamePad.DirectionPadUpRight"),
-                        Localization.Localization.GetText("PlayerInput.GamePad.DirectionPadDownLeft"),
-                        Localization.Localization.GetText("PlayerInput.GamePad.DirectionPadDownRight"),
-                        Localization.Localization.GetText("PlayerInput.GamePad.DirectionPadUp"),
-                        Localization.Localization.GetText("PlayerInput.GamePad.DirectionPadDown"),
-                        Localization.Localization.GetText("PlayerInput.GamePad.DirectionPadLeft"),
-                        Localization.Localization.GetText("PlayerInput.GamePad.DirectionPadRight"),
+                        GameLocalization.GetText("PlayerInput.GamePad.DirectionPadUpLeft"),
+                        GameLocalization.GetText("PlayerInput.GamePad.DirectionPadUpRight"),
+                        GameLocalization.GetText("PlayerInput.GamePad.DirectionPadDownLeft"),
+                        GameLocalization.GetText("PlayerInput.GamePad.DirectionPadDownRight"),
+                        GameLocalization.GetText("PlayerInput.GamePad.DirectionPadUp"),
+                        GameLocalization.GetText("PlayerInput.GamePad.DirectionPadDown"),
+                        GameLocalization.GetText("PlayerInput.GamePad.DirectionPadLeft"),
+                        GameLocalization.GetText("PlayerInput.GamePad.DirectionPadRight"),
                     },
                     {
-                        Localization.Localization.GetText("PlayerInput.GamePad.LeftStickUpLeft"),
-                        Localization.Localization.GetText("PlayerInput.GamePad.LeftStickUpRight"),
-                        Localization.Localization.GetText("PlayerInput.GamePad.LeftStickDownLeft"),
-                        Localization.Localization.GetText("PlayerInput.GamePad.LeftStickDownRight"),
-                        Localization.Localization.GetText("PlayerInput.GamePad.LeftStickUp"),
-                        Localization.Localization.GetText("PlayerInput.GamePad.LeftStickDown"),
-                        Localization.Localization.GetText("PlayerInput.GamePad.LeftStickLeft"),
-                        Localization.Localization.GetText("PlayerInput.GamePad.LeftStickRight"),
+                        GameLocalization.GetText("PlayerInput.GamePad.LeftStickUpLeft"),
+                        GameLocalization.GetText("PlayerInput.GamePad.LeftStickUpRight"),
+                        GameLocalization.GetText("PlayerInput.GamePad.LeftStickDownLeft"),
+                        GameLocalization.GetText("PlayerInput.GamePad.LeftStickDownRight"),
+                        GameLocalization.GetText("PlayerInput.GamePad.LeftStickUp"),
+                        GameLocalization.GetText("PlayerInput.GamePad.LeftStickDown"),
+                        GameLocalization.GetText("PlayerInput.GamePad.LeftStickLeft"),
+                        GameLocalization.GetText("PlayerInput.GamePad.LeftStickRight"),
                     },
                     {
-                        Localization.Localization.GetText("PlayerInput.GamePad.RightStickUpLeft"),
-                        Localization.Localization.GetText("PlayerInput.GamePad.RightStickUpRight"),
-                        Localization.Localization.GetText("PlayerInput.GamePad.RightStickDownLeft"),
-                        Localization.Localization.GetText("PlayerInput.GamePad.RightStickDownRight"),
-                        Localization.Localization.GetText("PlayerInput.GamePad.RightStickUp"),
-                        Localization.Localization.GetText("PlayerInput.GamePad.RightStickDown"),
-                        Localization.Localization.GetText("PlayerInput.GamePad.RightStickLeft"),
-                        Localization.Localization.GetText("PlayerInput.GamePad.RightStickRight"),
+                        GameLocalization.GetText("PlayerInput.GamePad.RightStickUpLeft"),
+                        GameLocalization.GetText("PlayerInput.GamePad.RightStickUpRight"),
+                        GameLocalization.GetText("PlayerInput.GamePad.RightStickDownLeft"),
+                        GameLocalization.GetText("PlayerInput.GamePad.RightStickDownRight"),
+                        GameLocalization.GetText("PlayerInput.GamePad.RightStickUp"),
+                        GameLocalization.GetText("PlayerInput.GamePad.RightStickDown"),
+                        GameLocalization.GetText("PlayerInput.GamePad.RightStickLeft"),
+                        GameLocalization.GetText("PlayerInput.GamePad.RightStickRight"),
                     },
                 };
 
@@ -326,19 +335,35 @@ namespace LostKingdom.GameContent
                     if (dpad[i, 3]) msg.Add(txt[i, 7]);
                 }
 
-                if (gamePadCurr.Buttons.BigButton == ButtonState.Pressed) msg.Add(Localization.Localization.GetText("PlayerInput.GamePad.BigButton"));
-                if (gamePadCurr.Buttons.A == ButtonState.Pressed) msg.Add(Localization.Localization.GetText("PlayerInput.GamePad.KeyA"));
-                if (gamePadCurr.Buttons.B == ButtonState.Pressed) msg.Add(Localization.Localization.GetText("PlayerInput.GamePad.KeyB"));
-                if (gamePadCurr.Buttons.X == ButtonState.Pressed) msg.Add(Localization.Localization.GetText("PlayerInput.GamePad.KeyX"));
-                if (gamePadCurr.Buttons.Y == ButtonState.Pressed) msg.Add(Localization.Localization.GetText("PlayerInput.GamePad.KeyY"));
-                if (gamePadCurr.Buttons.Back == ButtonState.Pressed) msg.Add(Localization.Localization.GetText("PlayerInput.GamePad.Back"));
-                if (gamePadCurr.Buttons.Start == ButtonState.Pressed) msg.Add(Localization.Localization.GetText("PlayerInput.GamePad.Start"));
-                if (gamePadCurr.Buttons.LeftShoulder == ButtonState.Pressed) msg.Add(Localization.Localization.GetText("PlayerInput.GamePad.LeftBumper"));
-                if (gamePadCurr.Buttons.RightShoulder == ButtonState.Pressed) msg.Add(Localization.Localization.GetText("PlayerInput.GamePad.RightBumper"));
-                if (gamePadCurr.Buttons.LeftStick == ButtonState.Pressed) msg.Add(Localization.Localization.GetText("PlayerInput.GamePad.LeftStickPressed"));
-                if (gamePadCurr.Buttons.RightStick == ButtonState.Pressed) msg.Add(Localization.Localization.GetText("PlayerInput.GamePad.RightStickPressed"));
-                if (gamePadCurr.Triggers.Left == 1f && gamePadLast.Triggers.Left != 1f) msg.Add(Localization.Localization.GetText("PlayerInput.GamePad.LeftTrigger"));
-                if (gamePadCurr.Triggers.Right == 1f && gamePadLast.Triggers.Right != 1f) msg.Add(Localization.Localization.GetText("PlayerInput.GamePad.RightTrigger"));
+                if (gamePadCurr.Buttons.BigButton == ButtonState.Pressed) msg.Add(GameLocalization.GetText("PlayerInput.GamePad.BigButton"));
+                if (gamePadCurr.Buttons.A == ButtonState.Pressed) msg.Add(GameLocalization.GetText("PlayerInput.GamePad.KeyA"));
+                if (gamePadCurr.Buttons.B == ButtonState.Pressed) msg.Add(GameLocalization.GetText("PlayerInput.GamePad.KeyB"));
+                if (gamePadCurr.Buttons.X == ButtonState.Pressed) msg.Add(GameLocalization.GetText("PlayerInput.GamePad.KeyX"));
+                if (gamePadCurr.Buttons.Y == ButtonState.Pressed) msg.Add(GameLocalization.GetText("PlayerInput.GamePad.KeyY"));
+                if (gamePadCurr.Buttons.Back == ButtonState.Pressed) msg.Add(GameLocalization.GetText("PlayerInput.GamePad.Back"));
+                if (gamePadCurr.Buttons.Start == ButtonState.Pressed) msg.Add(GameLocalization.GetText("PlayerInput.GamePad.Start"));
+                if (gamePadCurr.Buttons.LeftShoulder == ButtonState.Pressed) msg.Add(GameLocalization.GetText("PlayerInput.GamePad.LeftBumper"));
+                if (gamePadCurr.Buttons.RightShoulder == ButtonState.Pressed) msg.Add(GameLocalization.GetText("PlayerInput.GamePad.RightBumper"));
+                if (gamePadCurr.Buttons.LeftStick == ButtonState.Pressed) msg.Add(GameLocalization.GetText("PlayerInput.GamePad.LeftStickPressed"));
+                if (gamePadCurr.Buttons.RightStick == ButtonState.Pressed) msg.Add(GameLocalization.GetText("PlayerInput.GamePad.RightStickPressed"));
+                if (gamePadCurr.Triggers.Left == 1f && gamePadLast.Triggers.Left != 1f) msg.Add(GameLocalization.GetText("PlayerInput.GamePad.LeftTrigger"));
+                if (gamePadCurr.Triggers.Right == 1f && gamePadLast.Triggers.Right != 1f) msg.Add(GameLocalization.GetText("PlayerInput.GamePad.RightTrigger"));
+
+                KeyboardState keyboardCurr = currKeyboardState;
+                KeyboardState keyboardLast = lastKeyboardState;
+                if (keyboardCurr != keyboardLast)
+                {
+                    KeyboardEvent keyboardEvt = new KeyboardEvent();
+                    down = false;
+                    up = false;
+                    foreach (Keys key in Enum.GetValues(typeof(Keys)))
+                    {
+                        if (this.GetInputState(key) == InputState.Down) { keyboardEvt.down.Add(key); down = true; }
+                        if (this.GetInputState(key) == InputState.Up) { keyboardEvt.up.Add(key); up = true; }
+                    }
+                    if (down) this.KeyboardDown?.Invoke(this, keyboardEvt);
+                    if (up) this.KeyboardUp?.Invoke(this, keyboardEvt);
+                }
             }
 
             if (msg.Count > 0)
@@ -354,6 +379,7 @@ namespace LostKingdom.GameContent
                 this.gamePadMsg = "";
                 this.keyboardMsg = "";
             }
+            if (!Main.form.Focused) return;
             this.lastMouseState = this.currMouseState;
             this.currMouseState = Mouse.GetState();
             this.lastGamePadState = this.currGamePadState;
@@ -376,7 +402,7 @@ namespace LostKingdom.GameContent
             if (mouseMsg.Length > 0)
             {
                 pos.Y -= 22f;
-                string msg = Localization.Localization.GetText("PlayerInput.Mouse.Message", mouseMsg);
+                string msg = GameLocalization.GetText("PlayerInput.Mouse.Message", mouseMsg);
                 for (int i = 0; i < 4; i++)
                     Drawing.DrawColorfulString(spriteBatch, msg, pos + bpos[i], new Vector2(1.01f * Options.UIScale), 0, 0, this.opacity, c1);
                 Drawing.DrawColorfulString(spriteBatch, msg, pos, new Vector2(Options.UIScale), Main.timer * 16, 16, this.opacity, Main.rainbow_raw);
@@ -384,7 +410,7 @@ namespace LostKingdom.GameContent
             if (gamePadMsg.Length > 0)
             {
                 pos.Y -= 22f;
-                string msg = Localization.Localization.GetText("PlayerInput.GamePad.Message", gamePadMsg);
+                string msg = GameLocalization.GetText("PlayerInput.GamePad.Message", gamePadMsg);
                 for (int i = 0; i < 4; i++)
                     Drawing.DrawColorfulString(spriteBatch, msg, pos + bpos[i], new Vector2(1.01f * Options.UIScale), 0, 0, this.opacity, c1);
                 Drawing.DrawColorfulString(spriteBatch, msg, pos, new Vector2(Options.UIScale), Main.timer * 16, 16, this.opacity, Main.rainbow_raw);
@@ -394,11 +420,7 @@ namespace LostKingdom.GameContent
         public event Action<PlayerInput, MouseEvent> MouseUp;
         public event Action<PlayerInput, MouseEvent> MouseDown;
         public event Action<PlayerInput, MouseEvent> MouseClick;
-        public event Action<PlayerInput, MouseEvent> MouseClick2;
-        public event Action<PlayerInput, MouseEvent> MouseRightClick;
-        public event Action<PlayerInput, MouseEvent> MouseRightClick2;
-        public event Action<PlayerInput, MouseEvent> MouseMiddleClick;
-        public event Action<PlayerInput, MouseEvent> MouseMiddleClick2;
+        public event Action<PlayerInput, MouseEvent> MouseDoubleClick;
         public event Action<PlayerInput, MouseEvent> MouseWheel;
         public event Action<PlayerInput, KeyboardEvent> KeyboardUp;
         public event Action<PlayerInput, KeyboardEvent> KeyboardPressing;
@@ -410,10 +432,6 @@ namespace LostKingdom.GameContent
         protected virtual void OnMouseDown(UIElement e, MouseEvent evt) { }
         protected virtual void OnMouseClick(UIElement e, MouseEvent evt) { }
         protected virtual void OnMouseClick2(UIElement e, MouseEvent evt) { }
-        protected virtual void OnMouseRightClick(UIElement e, MouseEvent evt) { }
-        protected virtual void OnMouseRightClick2(UIElement e, MouseEvent evt) { }
-        protected virtual void OnMouseMiddleClick(UIElement e, MouseEvent evt) { }
-        protected virtual void OnMouseMiddleClick2(UIElement e, MouseEvent evt) { }
         protected virtual void OnMouseWheel(UIElement e, MouseEvent evt) { }
         protected virtual void OnKeyboardUp(UIElement e, KeyboardEvent evt) { }
         protected virtual void OnKeyboardPressing(UIElement e, KeyboardEvent evt) { }

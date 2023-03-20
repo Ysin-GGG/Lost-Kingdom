@@ -1,0 +1,26 @@
+{
+  "Card": {
+    "1": "Conjuration of Lightning",
+    "2": "Incineration",
+    "3": "Fireball",
+    "4": "Time Reversal",
+    "5": "Time Stop",
+    "6": "Time Jump"
+  },
+  "CardType": {
+    "Attack": "Attack",
+    "Skill": "Skill",
+    "Action": "Action",
+    "Status": "Status",
+    "Curse": "Curse"
+  },
+  "Effect": {
+    "Innate": "Innate",
+    "Exhaustible": "Exhaustible",
+    "Ethereal": "Ethereal",
+    "Quiescent": "Quiescent",
+    "Unusable": "Unusable",
+    "Echoic": "Echoic",
+    "Broken": "Broken"
+  }
+}

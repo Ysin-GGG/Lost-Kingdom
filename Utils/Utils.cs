@@ -5,56 +5,12 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace LostKingdom.Utils
 {
+    /// <summary> 实用工具库 </summary>
     public static class Utils
     {
-        public static int Clamp(int value, int min, int max)
-        {
-            if (value < min) return min;
-            if (value > max) return max;
-            return value;
-        }
-
-        public static float Clamp(float value, float min, float max)
-        {
-            if (value < min) return min;
-            if (value > max) return max;
-            return value;
-        }
-
-        public static double Clamp(double value, double min, double max)
-        {
-            if (value < min) return min;
-            if (value > max) return max;
-            return value;
-        }
-
-        public static T Min<T>(params T[] args) => args.Min();
-        public static byte Min(params byte[] args) => args.Min();
-        public static sbyte Min(params sbyte[] args) => args.Min();
-        public static short Min(params short[] args) => args.Min();
-        public static ushort Min(params ushort[] args) => args.Min();
-        public static int Min(params int[] args) => args.Min();
-        public static uint Min(params uint[] args) => args.Min();
-        public static long Min(params long[] args) => args.Min();
-        public static ulong Min(params ulong[] args) => args.Min();
-        public static float Min(params float[] args) => args.Min();
-        public static double Min(params double[] args) => args.Min();
-
-        public static T Max<T>(params T[] args) => args.Max();
-        public static byte Max(params byte[] args) => args.Max();
-        public static sbyte Max(params sbyte[] args) => args.Max();
-        public static short Max(params short[] args) => args.Max();
-        public static ushort Max(params ushort[] args) => args.Max();
-        public static int Max(params int[] args) => args.Max();
-        public static uint Max(params uint[] args) => args.Max();
-        public static long Max(params long[] args) => args.Max();
-        public static ulong Max(params ulong[] args) => args.Max();
-        public static float Max(params float[] args) => args.Max();
-        public static double Max(params double[] args) => args.Max();
-
         public static string Random(this string value, int length = 0)
         {
-            Random rand = new Random();
+            Rand rand = new Rand();
             int len = length > 0 ? length : value.Length;
             char[] res = value.ToCharArray(0, len);
             for (int i = 0; i < len; i++)
@@ -75,6 +31,13 @@ namespace LostKingdom.Utils
             float[] w2 = { 0f, rect.Width / 2f, rect.Width };
             float[] h2 = { 0f, rect.Height / 2f, rect.Height };
             return new Vector2(w2[w], h2[h]);
+        }
+
+        public static Vector2 ToRotation(this Vector2 value, float degree)
+        {
+            Vector2 newValue = new Vector2(value.X * MyMath.cos(degree) - value.Y * MyMath.sin(degree), value.X * MyMath.sin(degree) + value.Y * MyMath.cos(degree));
+
+            return newValue;
         }
 
         public static Vector2 TopLeft(this Rectangle rect) => Utils.GetPoint(rect, 0, 0);

@@ -21,12 +21,14 @@ namespace LostKingdom
         
         /// <summary> 视图大小 </summary>
         public static float ViewportScale { get => MyMath.Max(Main.screenWidth / 1920.0f, Main.screenWidth / 1080.0f); }
-        /// <summary> 总音量 </summary>
-        public static float TotalVolume { get; set; } = 1f;
+        /// <summary> 主音量 </summary>
+        public static float MasterVolume { get; set; } = 1f;
         /// <summary> 音乐音量 </summary>
         public static float MusicVolume { get; set; } = 1f;
-        /// <summary> 效果音量 </summary>
-        public static float EffectVolume { get; set; } = 1f;
+        /// <summary> 音效音量 </summary>
+        public static float SoundVolume { get; set; } = 1f;
+        /// <summary> 环境音量 </summary>
+        public static float AmbientVolume { get; set; } = 1f;
         /// <summary> 当前使用的语言 </summary>
         public static byte LanguageID { get; set; } = 1;
         /// <summary> 当前使用的分辨率类型 </summary>

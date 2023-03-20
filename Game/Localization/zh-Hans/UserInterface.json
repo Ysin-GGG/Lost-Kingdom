@@ -1,0 +1,45 @@
+{
+  "Main": {
+    "Play": "开始游戏",
+    "Library": "资料统计",
+    "About": "关于我们",
+    "Exit": "退出游戏"
+  },
+  "Options": {
+    "Tab": {
+      "Settings": "设置",
+      "Controls": "控制"
+    },
+    "Volume": {
+      "Name": "音量调节",
+      "MasterVolume": "主音量",
+      "MusicVolume": "音乐",
+      "SoundVolume": "音效",
+      "AmbientVolume": "环境"
+    },
+    "ScreenResolution": {
+      "Name": "屏幕分辨率",
+      "Current": "当前{$UserInterface.Options.ScreenResolution.Name}",
+      "Value": "{0}x{1}（{2}）",
+      "Windowing": "窗口化",
+      "Borderless": "无边框窗口化",
+      "FullScreen": "全屏"
+    },
+    "FPS": {
+      "Name": "帧率",
+      "Current": "当前{$UserInterface.Options.FPS.Name}"
+    },
+    "Language": {
+      "Name": "游戏语言",
+      "Current": "当前{$UserInterface.Options.Language.Name}",
+      "Unknown": "未知语种",
+      "English": "英语（English）",
+      "SimplifiedChinese": "简体中文"
+    }
+  },
+  "Debug": {
+    "FPS": "帧率：{0}",
+    "Memory": "内存占用：{0}",
+    "ScreenSize": "窗口大小：{0} "
+  }
+}

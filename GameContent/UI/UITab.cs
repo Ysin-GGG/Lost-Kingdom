@@ -8,7 +8,6 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using LostKingdom.Utils;
 
-
 namespace LostKingdom.GameContent.UI
 {
     public class UITab : UIElement
@@ -29,31 +28,32 @@ namespace LostKingdom.GameContent.UI
             this.ChildrenActive = false;
             this.ChildrenVisible = false;
             this.text = new UIText(this.size, name, Vector2.One * .8f, null, UIText.TextAlign.Bottom);
-            //this.text.AddTo(this);
         }
 
         protected override void OnMouseClick(UIElement e, MouseEvent evt)
         {
-            UITabbedPane panel = this.parent as UITabbedPane;
-            panel.children[panel.page].ChildrenActive = false;
-            panel.children[panel.page].ChildrenVisible = false;
-            panel.page = this.id;
-            this.ChildrenActive = true;
-            this.ChildrenVisible = true;
+            if (evt.leftButton == true)
+            {
+                UITabbedPane panel = this.parent as UITabbedPane;
+                panel.children[panel.page].ChildrenActive = false;
+                panel.children[panel.page].ChildrenVisible = false;
+                panel.page = this.id;
+                this.ChildrenActive = true;
+                this.ChildrenVisible = true;
+            }
         }
 
         protected override void UpdateUI(GameTime gameTime)
         {
-            this.LocateToParent = new Vector2(this.box.Width * 1.1f * this.id + 24, -this.box.Height);
-            if (!this.ChildrenVisible) this.location.Y += 10f;
+            this.LocateToParent = new Vector2(this.box.Width * 1.2f * this.id + 24, -this.box.Height);
+            if (this.ChildrenVisible) this.location.Y += 10f;
             this.text.location = this.location;
         }
 
-        /// <summary> 绘制你要在窗口上内容 </summary>
+        /// <summary> 绘制在窗口上的内容 </summary>
         protected override void DrawUI(SpriteBatch spriteBatch)
         {
-            /* 绘制标签 */
-            spriteBatch.Draw(this.box, this.location, Color.White);
+            spriteBatch.Draw(this.box, this.location, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
             this.text.Draw(spriteBatch);
             this.Draw?.Invoke(spriteBatch, parent.location);
         }

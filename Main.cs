@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Windows.Forms;
@@ -11,9 +12,11 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using LostKingdom.Utils;
-using LostKingdom.GameContent.Localization;
-using LostKingdom.GameContent.UI;
 using LostKingdom.GameContent;
+using LostKingdom.GameContent.IO;
+using LostKingdom.GameContent.UI;
+using LostKingdom.GameContent.Audio;
+using LostKingdom.GameContent.Localization;
 
 namespace LostKingdom
 {
@@ -24,6 +27,12 @@ namespace LostKingdom
         public const string versionString = "beta v0.0.1.0";
         /// <summary> 版本号 </summary>
         public const string versionNumber = "0.0.1.0";
+        /// <summary> 最多同时存在的敌人数 </summary>
+        public const ushort maxEnemies = 12;
+        /// <summary> 最多同时存在的玩家数 </summary>
+        public const ushort maxPlayers = 4;
+        /// <summary> 最多同时存在的弹幕数 </summary>
+        public const ushort maxProjectiles = 600;
 
         public static GraphicsDeviceManager MyGraphics { get; private set; }
         public static SpriteBatch MySpriteBatch { get; private set; }
@@ -48,10 +57,12 @@ namespace LostKingdom
         {
             get
             {
-                Vector2 size = Vector2.Zero;
-                size.X = Main.screenWidth = Main.instance.GraphicsDevice.PresentationParameters.BackBufferWidth;
-                size.Y = Main.screenHeight = Main.instance.GraphicsDevice.PresentationParameters.BackBufferHeight;
-                return size;
+                if (Main.instance.GraphicsDevice != null)
+                {
+                    Main.screenWidth = Main.instance.GraphicsDevice.PresentationParameters.BackBufferWidth;
+                    Main.screenHeight = Main.instance.GraphicsDevice.PresentationParameters.BackBufferHeight;
+                }
+                return new Vector2(Main.screenWidth, Main.screenHeight);
             }
             set
             {
@@ -78,6 +89,11 @@ namespace LostKingdom
         public static Color rainbow => rainbow_raw[timer * 16 % rainbow_raw.Length];
         public static Color bgColor = Color.Black;
 
+        public static event Action<GameTime> PreUpdate;
+        public static event Action<GameTime> PostUpdate;
+        public static event Action<SpriteBatch> PreDraw;
+        public static event Action<SpriteBatch> PostDraw;
+
         /// <summary> 游戏日志 </summary>
         public static Logger logger = null;
         /// <summary> 视图矩阵 </summary>
@@ -88,14 +104,16 @@ namespace LostKingdom
         public static Main instance = null;
         /// <summary> Main实例 </summary>
         public static Form form = null;
-        /// <summary> 可选的分辨率 </summary>
+        /// <summary> 可用分辨率 </summary>
         public static Vector2[] SupportedScreenResolution { get; private set; }
         /// <summary> 当前房间的敌人 </summary>
-        public static readonly Enemy[] enemy = new Enemy[6];
+        public static readonly Enemy[] enemy = new Enemy[Main.maxEnemies];
         /// <summary> 当前房间的玩家 </summary>
-        public static readonly Player[] player = new Player[4];
+        public static readonly Player[] player = new Player[Main.maxPlayers];
+        /// <summary> 当前房间的玩家 </summary>
+        public static readonly Projectile[] projectile = new Projectile[Main.maxProjectiles];
         /// <summary> 玩家设备输入信息 </summary>
-        public static readonly PlayerInput[] playerInput = new PlayerInput[4];
+        public static readonly PlayerInput[] playerInput = new PlayerInput[Main.maxPlayers];
         /// <summary> UI绘制图层 </summary>
         public static readonly List<UILayer> UIs = new List<UILayer>();
         /// <summary> 当前玩家设备输入信息 </summary>
@@ -116,6 +134,8 @@ namespace LostKingdom
         public static short screenOffTime;
         /// <summary> 界面透明度（为0时全黑） </summary>
         public static float screenOpacity;
+        /// <summary> 界面透明度（为0时全黑） </summary>
+        public static float screenOpacity2;
 
         /// <summary> 帧率 </summary>
         public static byte FPS = 0;
@@ -123,32 +143,39 @@ namespace LostKingdom
         public static long Memory = 0;
         /// <summary> 逻辑刷新（锁60帧） </summary>
         public static bool GameUpdate = false;
+        /// <summary> 游戏暂停 </summary>
+        public static bool GamePause = false;
+        /// <summary> 忽略程序错误（即本程序不执行throw语句） </summary>
+        public static bool IgnoreError = true;
         /// <summary> 当前是否全屏 </summary>
         public bool isFullScreen = false;
         /// <summary> 当前是否窗口最大化 </summary>
         public bool isScreenMaximized = false;
+        /// <summary> 通用伪随机数生成器 </summary>
+        public static Rand rand;
         
         private static float screenOpacitySpeed;
         private static long oldTicks = 0;
         private Stopwatch fpsTimer = new Stopwatch();
         private int fpsCounter = 0;
-
-
+        
+        /// <summary> 游戏程序入口 </summary>
         public Main()
         {
-            Localization.Initialize();
+            GameLocalization.Initialize();
             Main.instance = this;
             Main.MyGraphics = new GraphicsDeviceManager(this);
             Main.logger = new Logger();
-            Main.logger.Write(Localization.GetText("Logger.Message.Loading"), Localization.GetText("Logger.Sender.GameName"));
+            Main.logger.Write(GameLocalization.GetText("Logger.Message.Loading"), GameLocalization.GetText("Logger.Sender.GameName"));
             this.Content.RootDirectory = "Content";
             this.Window.AllowUserResizing = true;
-            this.Window.Title = Localization.GetText("Game.GameName");
+            this.Window.Title = GameLocalization.GetText("Game.GameName");
             Main.form = (Form)Control.FromHandle(this.Window.Handle);
             Main.form.FormBorderStyle = FormBorderStyle.FixedSingle;
             Main.form.MaximizeBox = false;
         }
 
+        /// <summary> 游戏初始化 </summary>
         protected override void Initialize()
         {
             base.Initialize();
@@ -160,22 +187,30 @@ namespace LostKingdom
             Main.InitRainbow();
             this.InitScreen();
             this.InitTargets();
+            Audio.Initialize();
+            Preferences.LoadConfig();
             this.InitUserInterface();
-            this.fpsTimer.Start();
-            Options.FramePerSecond = 120;
             Main.gameMatrix = Matrix.Identity;
             Main.uiScaleMatrix = Matrix.CreateScale(Options.UIScale, Options.UIScale, 0.0f);
-            this.Window.ClientSizeChanged += new EventHandler<EventArgs>(this.OnSizeChanged);
+            this.Window.ClientSizeChanged += new EventHandler<EventArgs>((x, y) => this.OnSizeChanged());
+            Main.rand = new Rand(0u);
+            this.fpsTimer.Start();
+
+            Main.player[0] = new Player();
+            for (int i = 0; i < 10; i++) Player.Me.hand.Add(new Card((ushort)(i % 3 + 1)));
+            Main.CurrInput.MouseClick += new Action<PlayerInput, MouseEvent>((x, y) => this.Test());
         }
 
-        private void OnSizeChanged(object sender, EventArgs args)
+        /// <summary> 改变分辨率时执行的事件 </summary>
+        private void OnSizeChanged()
         {
             Main.screenWidth = Main.instance.GraphicsDevice.PresentationParameters.BackBufferWidth;
             Main.screenHeight = Main.instance.GraphicsDevice.PresentationParameters.BackBufferHeight;
             Main.ClientSizeChanged?.Invoke();
             this.InitTargets();
         }
-        
+
+        /// <summary> 屏幕数据初始化 </summary>
         private void InitScreen()
         {
             List<Vector2> resolution = new List<Vector2>();
@@ -187,9 +222,10 @@ namespace LostKingdom
             Main.SupportedScreenResolution = resolution.ToArray();
             Point maxSize = Main.SupportedScreenResolution.Last().ToPoint();
             Main.form.MaximumSize = new System.Drawing.Size(maxSize.X, maxSize.Y);
-            Main.ScreenSize = Main.SupportedScreenResolution[Main.SupportedScreenResolution.Length / 2];
+            Main.ScreenSize = Main.BestScreenSize;
         }
 
+        /// <summary> 清除渲染对象 </summary>
         protected void ClearTargets()
         {
             if (Main.MyRenderTarget != null)
@@ -204,6 +240,7 @@ namespace LostKingdom
             }
         }
 
+        /// <summary> 渲染对象初始化 </summary>
         protected void InitTargets()
         {
             bool mipMap = false;
@@ -217,29 +254,35 @@ namespace LostKingdom
             if (Main.MyRenderTargetSwap == null) Main.MyRenderTargetSwap = new RenderTarget2D(this.GraphicsDevice, width, height, mipMap, surface, depth, 0, RenderTargetUsage.PreserveContents);
         }
 
+        /// <summary> UI初始化 </summary>
         protected void InitUserInterface()
         {
             foreach (UILayer.LayerName layer in Enum.GetValues(typeof(UILayer.LayerName)))
                 new UILayer(layer.ToString(), (int)layer);
         }
         
+        /// <summary> 载入资源 </summary>
         protected override void LoadContent()
         {
             List<Texture2D> list = new List<Texture2D>();
             Asset.LoadFonts();
             Asset.LoadImages();
+            Asset.LoadCards();
             Asset.LoadUIs();
             Asset.LoadCursor();
             Asset.LoadSounds();
             Asset.LoadSplashs();
-            MySpriteFont = Asset.Font["Text"];
+            Main.MySpriteFont = Asset.Font["Text"];
         }
         
+        /// <summary> 释放资源 </summary>
         protected override void UnloadContent()
         {
-            Content.Unload();
+            this.Content.Unload();
+            Preferences.SaveConfig();
         }
 
+        /// <summary> 设置分辨率 </summary>
         private void SetScreen(int width, int height, bool fullScreen)
         {
             Form form = Control.FromHandle(this.Window.Handle) as Form;
@@ -274,11 +317,23 @@ namespace LostKingdom
             }
         }
 
+        private void Test()
+        {
+            Player.Me.Shuffle(true);
+            Player.Me.hand.AddRange(Player.Me.drawPile);
+            Player.Me.drawPile.Clear();
+            Main.screenOpacity2 = 0;
+        }
+
+        /// <summary> 游戏刷新 </summary>
         protected override void Update(GameTime gameTime)
         {
+            Main.PreUpdate?.Invoke(gameTime);
+            this.IsMouseVisible = !Main.form.Focused;
             foreach (PlayerInput input in Main.playerInput) input?.Update(gameTime);
-            
+
             Main.GameUpdate = false;
+            if (Main.screenOpacity2 < 1f) Main.screenOpacity2 += 3f / Options.FramePerSecond;
             if (gameTime.TotalGameTime.Ticks - oldTicks >= 166667)
             {
                 if (Main.screenOpacitySpeed != 0.0f)
@@ -297,7 +352,17 @@ namespace LostKingdom
                         }
                     }
                 }
-                foreach (Player p in Main.player) if (p != null && p.active) p.UpdateEffect();
+                foreach (Enemy enemy in Main.enemy)
+                    if (enemy != null && enemy.active)
+                        enemy.UpdateEntity(gameTime);
+
+                foreach (Player player in Main.player)
+                    if (player != null && player.active)
+                        player.UpdateEntity(gameTime);
+
+                foreach (Projectile projectile in Main.projectile)
+                    if (projectile != null && projectile.active)
+                        projectile.UpdateProjectile(gameTime);
 
                 Main.timer++;
                 oldTicks += 166667;
@@ -309,30 +374,34 @@ namespace LostKingdom
                 ui.UpdateUI(gameTime);
                 if (ui.active) ui.origin?.Update(gameTime);
             }
+            Main.PostUpdate?.Invoke(gameTime);
         }
 
+        /// <summary> 游戏渲染 </summary>
         protected override void Draw(GameTime gameTime)
         {
-            if (fpsTimer.ElapsedMilliseconds >= 1000)
+            if (this.fpsTimer.ElapsedMilliseconds >= 1000)
             {
                 Main.Memory = Process.GetCurrentProcess().WorkingSet64;
                 Main.FPS = (byte)fpsCounter;
                 this.fpsCounter = 0;
-                fpsTimer.Restart();
+                this.fpsTimer.Restart();
             }
             else this.fpsCounter++;
 
+            Main.PreDraw?.Invoke(Main.MySpriteBatch);
             Main.uiScaleMatrix = Matrix.CreateScale(Options.UIScale, Options.UIScale, 0.0f);
             foreach (UILayer ui in Main.UIs)
             {
                 if (!ui.visible) continue;
-                Main.MySpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Matrix.Identity);
+                Main.MySpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Matrix.Identity);
                 ui.Draw(Main.MySpriteBatch);
                 Main.MySpriteBatch.End();
-                Main.MySpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Main.uiScaleMatrix);
+                Main.MySpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Main.uiScaleMatrix);
                 ui.origin?.Draw(Main.MySpriteBatch);
                 Main.MySpriteBatch.End();
             }
+            Main.PostDraw?.Invoke(Main.MySpriteBatch);
         }
 
         public static void InitRainbow()

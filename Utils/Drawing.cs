@@ -8,6 +8,7 @@ using LostKingdom.GameContent.UI;
 
 namespace LostKingdom.Utils
 {
+    /// <summary> 绘制工具库 </summary>
     public static class Drawing
     {
         private static SpriteBatch stringSprite = Main.MySpriteBatch;
@@ -68,11 +69,12 @@ namespace LostKingdom.Utils
         /// <param name="spriteBatch"></param>
         /// <param name="corner"> 方框直角 </param>
         /// <param name="pos"> 绘制坐标 </param>
-        /// <param name="size"> 方框尺寸 </param>
+        /// <param name="size"> 方框尺寸（最小为角贴图尺寸的2倍） </param>
         /// <param name="color"> 方框颜色 </param>
         public static void DrawBoxByCorner(SpriteBatch spriteBatch, Texture2D corner, Vector2 pos, Vector2 size, Color? color = null)
         {
-            if (size.X < corner.Width * 2.0f || size.Y < corner.Height * 2.0f) size = corner.Size() * 2.0f;
+            if (size.X < corner.Width * 2.0f) size.X = corner.Width * 2.0f;
+            if (size.Y < corner.Height * 2.0f) size.Y = corner.Height * 2.0f;
             Color c = color ?? Color.White;
             Vector2 origin = Vector2.Zero;
             SpriteEffects[] effects = { SpriteEffects.None, SpriteEffects.FlipHorizontally, SpriteEffects.FlipVertically };
@@ -131,8 +133,7 @@ namespace LostKingdom.Utils
             Drawing.backStringColor = color ?? Drawing.backStringColor;
             Drawing.backStringScale = scale ?? new Vector2(1.1f);
         }
-
-
+        
         /// <summary> 绘制文本 </summary>
         /// <param name="text"> 文本 </param>
         /// <param name="color"> 文本颜色 </param>
@@ -146,7 +147,7 @@ namespace LostKingdom.Utils
                     Drawing.stringCurPos.X = Drawing.stringLocation.X;
                     Drawing.stringCurPos.Y += Drawing.stringFont.LineSpacing * Drawing.stringScale.Y;
                 }
-                else
+                if (s != "\n")
                 {
                     foreach (Vector2 offset in Drawing.backStringOffset)
                         Drawing.stringSprite.DrawString(Drawing.stringFont, s, Drawing.stringCurPos + offset, Drawing.backStringColor, 0f, Vector2.Zero, Drawing.backStringScale, SpriteEffects.None, 0f);

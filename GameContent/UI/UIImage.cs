@@ -22,9 +22,9 @@ namespace LostKingdom.GameContent.UI
                 switch (this.drawStyle)
                 {
                     case UIImageDrawStyle.AdaptiveShorter:
-                        return new Vector2(Utils.Utils.Min(this.size.X / this.image.Width, this.size.Y / this.image.Height));
+                        return new Vector2(MyMath.Min(this.size.X / this.image.Width, this.size.Y / this.image.Height));
                     case UIImageDrawStyle.AdaptiveLonger:
-                        return new Vector2(Utils.Utils.Max(this.size.X / this.image.Width, this.size.Y / this.image.Height));
+                        return new Vector2(MyMath.Max(this.size.X / this.image.Width, this.size.Y / this.image.Height));
                     case UIImageDrawStyle.Full:
                         return this.size / this.image.Size();
                 }

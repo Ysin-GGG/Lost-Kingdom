@@ -51,12 +51,12 @@ namespace LostKingdom.GameContent.UI
             {
                 if (this.imageOpacity < this.imageOpacityMax)
                 {
-                    this.imageOpacity = Utils.Utils.Clamp(Utils.Utils.Min(this.imageOpacity + this.speed, this.imageOpacityMax), 0.0f, 1.0f);
+                    this.imageOpacity = MyMath.Clamp(MyMath.Min(this.imageOpacity + this.speed, this.imageOpacityMax), 0.0f, 1.0f);
                     this.imageColor = Color.Lerp(this.imageColor1, this.imageColor2, this.imageOpacity);
                 }
                 if (this.boxOpacity < this.boxOpacityMax)
                 {
-                    this.boxOpacity = Utils.Utils.Clamp(Utils.Utils.Min(this.boxOpacity + this.speed, this.boxOpacityMax), 0.0f, 1.0f);
+                    this.boxOpacity = MyMath.Clamp(MyMath.Min(this.boxOpacity + this.speed, this.boxOpacityMax), 0.0f, 1.0f);
                     this.boxColor = Color.Lerp(this.boxColor1, this.boxColor2, this.boxOpacity);
                 }
             }
@@ -64,12 +64,12 @@ namespace LostKingdom.GameContent.UI
             {
                 if (this.imageOpacity > this.imageOpacityMin)
                 {
-                    this.imageOpacity = Utils.Utils.Clamp(Utils.Utils.Max(this.imageOpacity - this.speed, this.imageOpacityMin), 0.0f, 1.0f);
+                    this.imageOpacity = MyMath.Clamp(MyMath.Max(this.imageOpacity - this.speed, this.imageOpacityMin), 0.0f, 1.0f);
                     this.imageColor = Color.Lerp(this.imageColor1, this.imageColor2, this.imageOpacity);
                 }
                 if (this.boxOpacity > this.boxOpacityMin)
                 {
-                    this.boxOpacity = Utils.Utils.Clamp(Utils.Utils.Max(this.boxOpacity - this.speed, this.boxOpacityMin), 0.0f, 1.0f);
+                    this.boxOpacity = MyMath.Clamp(MyMath.Max(this.boxOpacity - this.speed, this.boxOpacityMin), 0.0f, 1.0f);
                     this.boxColor = Color.Lerp(this.boxColor1, this.boxColor2, this.boxOpacity);
                 }
             }

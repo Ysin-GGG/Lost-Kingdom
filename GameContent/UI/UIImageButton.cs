@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
+using LostKingdom.GameContent.Audio;
 using LostKingdom.Utils;
 
 namespace LostKingdom.GameContent.UI
@@ -21,6 +22,16 @@ namespace LostKingdom.GameContent.UI
             this.scale = Vector2.One;
             this.size = image.Size();
             this.size.Y /= 2.0f;
+        }
+
+        protected override void OnMouseEnter(UIElement e, MouseEvent evt)
+        {
+            Audio.Audio.RawSound[0].Replay();
+        }
+
+        protected override void OnMouseClick(UIElement e, MouseEvent evt)
+        {
+            if (evt.leftButton) Audio.Audio.RawSound[1].Play();
         }
 
         protected sealed override void DrawUI(SpriteBatch spriteBatch)
