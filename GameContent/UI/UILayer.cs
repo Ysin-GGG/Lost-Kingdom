@@ -148,7 +148,7 @@ namespace LostKingdom.GameContent.UI
                     ele.IgnoreMe = true;
                     ele.LocateToParent = new Vector2(Main.BestScreenWidth / 2 - 300.0f, 250.0f);
                     ele.AddTo(tab);
-                    for(int i = 0; i < 3; i++) new UIComboBox(Asset.UI["UIComboBox1"]).AddTo(ele);
+                    for(int i = 0; i < 3; i++) new UIComboBox(Asset.UI["UIComboBox2"]).AddTo(ele);
                     UIComboBox comboBox = (UIComboBox)ele.children[2];
                     comboBox.name.text = GameLocalization.GetText("UserInterface.Options.ScreenResolution.Name");
                     comboBox.lineWidth -= 16f;

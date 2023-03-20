@@ -37,7 +37,7 @@ namespace LostKingdom.GameContent.UI
 
         protected override void OnMouseEnter(UIElement e, MouseEvent evt)
         {
-            if(e == this || this.item.ChildrenVisible) Audio.Audio.RawSound[0].Replay();
+            if ((e == this && !this.item.ChildrenVisible) || (e != this.item && this.item.ChildrenVisible)) Audio.Audio.RawSound[0].Replay();
         }
 
         protected override void OnMouseClick(UIElement e, MouseEvent evt)
@@ -65,7 +65,7 @@ namespace LostKingdom.GameContent.UI
             text.MouseClick += click;
             text.MouseClick += this.OnMouseClick;
             text.MouseEnter += this.OnMouseEnter;
-            text.LocateToParent = new Vector2(0f, this.image.Height / 2 * this.item.children.Count - 2);
+            text.LocateToParent = new Vector2(0f, this.image.Height / 2 * this.item.children.Count - 4);
             return text;
         }
 
@@ -102,6 +102,8 @@ namespace LostKingdom.GameContent.UI
             Rectangle frame = this.image.Frame(0, this.item.ChildrenVisible ? 1 : 0, 1, 2);
             Color color = Color.Lerp(Color.Black, Color.White, this.item.ChildrenVisible || this.IsMouseHovering ? MyMath.phi0 : 1f);
             if (this.image != null) spriteBatch.Draw(this.image, this.location, frame, color, 0f, Vector2.Zero, this.scale, 0, 0f);
+            UIElement line = this.item.children.Find((e) => e.IsMouseHovering == true);
+            if (this.item.ChildrenVisible && line != null) spriteBatch.Draw(Asset.Image["LineEffect"], line.Bounds, new Color(96, 96, 96, 0));
         }
     }
 }

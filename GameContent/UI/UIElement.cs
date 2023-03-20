@@ -136,7 +136,7 @@ namespace LostKingdom.GameContent.UI
             {
                 MouseState mouseCurr = Main.CurrInput.currMouseState;
                 MouseState mouseLast = Main.CurrInput.lastMouseState;
-                if (mouseCurr != mouseLast)
+                //if (mouseCurr != mouseLast)
                 {
                     Vector2 currMousePos = new Vector2(mouseCurr.X, mouseCurr.Y);
                     Vector2 lastMousePos = new Vector2(mouseLast.X, mouseLast.Y);
