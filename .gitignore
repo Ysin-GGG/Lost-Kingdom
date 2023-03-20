@@ -5,6 +5,8 @@
 *.sln
 Microsoft.Xna.Framework.*
 Newtonsoft.Json.*
+Config.json
+Saves/
 
 
 ## Ignore Visual Studio temporary files, build results, and
